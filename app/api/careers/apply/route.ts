@@ -3,68 +3,64 @@ import { query } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
+export async function GET() {
+  try {
+    const rows = await query(`SELECT * FROM job_applications ORDER BY applied_at DESC;`);
+    return NextResponse.json(rows);
+  } catch (err: any) {
+    console.error("[Job Applications API] GET error:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const {
-      positionTitle,
-      name,
-      email,
-      phone,
-      experience,
-      location,
-    } = body;
+
+    const positionTitle = (body.positionTitle || body.position_title || body.position || "General Applicant").trim();
+    const name = (body.name || "").trim();
+    const email = (body.email || "").trim();
+    const phone = (body.phone || "").trim();
+    const experience = (body.experience || "").trim();
+    const location = (body.location || "").trim();
 
     if (!name || !email) {
       return NextResponse.json(
-        { error: "Candidate full name and email address are required" },
+        { success: false, message: "Applicant name and email are required." },
         { status: 400 }
       );
     }
 
-    // Generate formal candidate tracking application ref: APP-2026-XXXX
-    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const applicationRef = `APP-2026-${randomSuffix}`;
+    const applicationRef = `APP-2026-${Math.floor(1000 + Math.random() * 9000)}`;
 
     const rows = await query(
       `INSERT INTO job_applications (
-        application_ref,
-        name,
-        email,
-        phone,
-        position_title,
-        experience,
-        location,
-        status,
-        applied_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'RECEIVED', NOW())
+        application_ref, position_title, name, email, phone, experience, location, status, applied_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
       RETURNING *;`,
       [
         applicationRef,
-        name.trim(),
-        email.trim(),
-        (phone || "").trim(),
-        positionTitle || "Pipeline Engineering Candidate",
-        (experience || "").trim(),
-        (location || "").trim(),
+        positionTitle,
+        name,
+        email,
+        phone || null,
+        experience || null,
+        location || null,
+        "UNDER_REVIEW",
       ]
     );
 
-    const appRecord = rows[0];
-
     return NextResponse.json({
       success: true,
-      applicationRef: appRecord.application_ref,
-      message: "Job Application submitted successfully to HR Division.",
-      positionTitle: appRecord.position_title,
-      status: appRecord.status || "RECEIVED",
-      timestamp: appRecord.applied_at,
-      data: appRecord,
+      applicationRef: rows[0]?.application_ref || applicationRef,
+      message: "Application registered successfully with HR division.",
+      positionTitle,
+      data: rows[0],
     });
   } catch (err: any) {
-    console.error("[API careers/apply] POST error:", err);
+    console.error("[Job Applications API] POST error:", err);
     return NextResponse.json(
-      { error: err.message || "Failed to submit job application" },
+      { success: false, message: err.message || "Failed to submit job application" },
       { status: 500 }
     );
   }

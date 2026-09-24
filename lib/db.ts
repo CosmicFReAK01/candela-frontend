@@ -19,31 +19,20 @@ function sanitizeDatabaseUrl(url: string | undefined): string | undefined {
   return clean;
 }
 
-const connectionString = sanitizeDatabaseUrl(process.env.DATABASE_URL);
+const SUPABASE_DB_URL = "postgresql://postgres.xgsnlssgcdzoipjmegbx:CandelaDb%232026!@aws-0-ap-southeast-2.pooler.supabase.com:6543/postgres";
+const connectionString = sanitizeDatabaseUrl(process.env.DATABASE_URL) || SUPABASE_DB_URL;
 
 const isServerless = !!process.env.VERCEL || process.env.NODE_ENV === "production";
 
 export const pool =
   globalForDb.pool ??
-  (connectionString
-    ? new Pool({
-        connectionString,
-        ssl: process.env.DATABASE_SSL === "false" ? false : { rejectUnauthorized: false },
-        max: isServerless ? 2 : 10,
-        idleTimeoutMillis: 10000,
-        connectionTimeoutMillis: 10000,
-      })
-    : new Pool({
-        host: process.env.PGHOST || "localhost",
-        port: Number(process.env.PGPORT) || 5433,
-        user: process.env.PGUSER || "postgres",
-        password: process.env.PGPASSWORD || "9906",
-        database: process.env.PGDATABASE || "GasPipeline",
-        ssl: process.env.PGSSL === "true" ? { rejectUnauthorized: false } : false,
-        max: 10,
-        idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 10000,
-      }));
+  new Pool({
+    connectionString,
+    ssl: process.env.DATABASE_SSL === "false" ? false : { rejectUnauthorized: false },
+    max: isServerless ? 2 : 10,
+    idleTimeoutMillis: 10000,
+    connectionTimeoutMillis: 10000,
+  });
 
 if (process.env.NODE_ENV !== "production") {
   globalForDb.pool = pool;

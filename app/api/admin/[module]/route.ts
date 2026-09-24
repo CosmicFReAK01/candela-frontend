@@ -437,7 +437,7 @@ export async function PUT(req: Request, { params }: RouteProps) {
           `UPDATE rfq_enquiries SET
              status = COALESCE($1, status),
              admin_notes = COALESCE($2, admin_notes)
-           WHERE id = $3 RETURNING *;`,
+           WHERE id::text = $3::text RETURNING *;`,
           [body.status, body.admin_notes || body.notes, id]
         );
         return NextResponse.json({ success: true, data: rows[0] });
@@ -449,7 +449,7 @@ export async function PUT(req: Request, { params }: RouteProps) {
           `UPDATE job_applications SET
              status = COALESCE($1, status),
              admin_notes = COALESCE($2, admin_notes)
-           WHERE id = $3 RETURNING *;`,
+           WHERE id::text = $3::text RETURNING *;`,
           [body.status, body.admin_notes || body.notes, id]
         );
         return NextResponse.json({ success: true, data: rows[0] });
@@ -532,12 +532,12 @@ export async function DELETE(req: Request, { params }: RouteProps) {
       }
 
       case "rfq": {
-        await query(`DELETE FROM rfq_enquiries WHERE id = $1;`, [id]);
+        await query(`DELETE FROM rfq_enquiries WHERE id::text = $1::text;`, [id]);
         return NextResponse.json({ success: true, message: `RFQ ${id} deleted` });
       }
 
       case "applications": {
-        await query(`DELETE FROM job_applications WHERE id = $1;`, [id]);
+        await query(`DELETE FROM job_applications WHERE id::text = $1::text;`, [id]);
         return NextResponse.json({ success: true, message: `Application ${id} deleted` });
       }
 

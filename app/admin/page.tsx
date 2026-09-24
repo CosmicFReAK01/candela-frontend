@@ -2756,6 +2756,7 @@ export default function AdminPortal() {
                               onChange={(e) => handleUpdateRfqStatus(r.id, e.target.value)}
                               className="px-2 py-1 rounded text-[11px] font-bold border bg-white border-[#D9D9D9]"
                             >
+                              <option value="PENDING_REVIEW">PENDING REVIEW</option>
                               <option value="NEW">NEW</option>
                               <option value="UNDER REVIEW">UNDER REVIEW</option>
                               <option value="QUOTED">QUOTED</option>
@@ -2837,6 +2838,7 @@ export default function AdminPortal() {
                               className="px-2 py-1 rounded text-[11px] font-bold border bg-white border-[#D9D9D9]"
                             >
                               <option value="RECEIVED">RECEIVED</option>
+                              <option value="UNDER_REVIEW">UNDER REVIEW</option>
                               <option value="SHORTLISTED">SHORTLISTED</option>
                               <option value="INTERVIEW_SCHEDULED">INTERVIEW_SCHEDULED</option>
                               <option value="HIRED">HIRED</option>
