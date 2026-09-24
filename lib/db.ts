@@ -21,14 +21,16 @@ function sanitizeDatabaseUrl(url: string | undefined): string | undefined {
 
 const connectionString = sanitizeDatabaseUrl(process.env.DATABASE_URL);
 
+const isServerless = !!process.env.VERCEL || process.env.NODE_ENV === "production";
+
 export const pool =
   globalForDb.pool ??
   (connectionString
     ? new Pool({
         connectionString,
         ssl: process.env.DATABASE_SSL === "false" ? false : { rejectUnauthorized: false },
-        max: 10,
-        idleTimeoutMillis: 30000,
+        max: isServerless ? 2 : 10,
+        idleTimeoutMillis: 10000,
         connectionTimeoutMillis: 10000,
       })
     : new Pool({
