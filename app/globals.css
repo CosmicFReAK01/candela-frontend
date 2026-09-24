@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* ══════════════════════════════════════════════════════════════════
+   IVORY & CAMEL LUXURY PALETTE — Minimalist Architectural System
+   Ivory: #F8F4EC · Platinum: #D9D9D9 · White: #FFFFFF · Camel: #C69C6D · Charcoal: #242424
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+  --ivory: #F8F4EC;
+  --platinum: #D9D9D9;
+  --white: #FFFFFF;
+  --camel: #C69C6D;
+  --camel-dark: #B08554;
+  --charcoal: #242424;
+  --charcoal-muted: #5A5E62;
+  --surface: #FFFFFF;
+  --surface-alt: #F3EFE7;
+  --border: #D9D9D9;
+  --border-light: #E8E3DA;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #F8F4EC;
+  color: #242424;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: #C69C6D;
+  color: #FFFFFF;
+}
+
+/* ── Layout ──────────────────────────────── */
+
+.container-x {
+  width: min(1280px, calc(100% - 40px));
+  margin-inline: auto;
+}
+
+/* ── Typography ──────────────────────────── */
+
+.font-heading {
+  font-family: 'Outfit', system-ui, sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ── Custom Scrollbar ────────────────────── */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F8F4EC;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D9D9D9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C69C6D;
+}
+
+/* ── Utility Animations ──────────────────── */
+
+@keyframes flowDash {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+.animate-flow-dash {
+  animation: flowDash 15s linear infinite;
+}
