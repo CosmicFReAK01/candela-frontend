@@ -3,7 +3,23 @@ import { Pool } from "pg";
 // Global database connection pool for PostgreSQL on port 5433 (GasPipeline)
 const globalForDb = globalThis as unknown as { pool?: Pool };
 
-const connectionString = process.env.DATABASE_URL;
+function sanitizeDatabaseUrl(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  let clean = url.trim();
+  // Strip surrounding quotes if present
+  if ((clean.startsWith('"') && clean.endsWith('"')) || (clean.startsWith("'") && clean.endsWith("'"))) {
+    clean = clean.slice(1, -1).trim();
+  }
+  // Auto-correct user[password]@ -> user:password@
+  clean = clean.replace(/([a-zA-Z0-9_.]+)\[(.*?)\]@/, (_m, user, pwd) => `${user}:${encodeURIComponent(pwd)}@`);
+  // Auto-correct user:[password]@ -> user:password@
+  clean = clean.replace(/:\[(.*?)\]@/, (_m, pwd) => `:${encodeURIComponent(pwd)}@`);
+  // Auto-encode unencoded '#' in password
+  clean = clean.replace(/:([^:@/]+)#([^@]+)@/, (_m, p1, p2) => `:${p1}%23${p2}@`);
+  return clean;
+}
+
+const connectionString = sanitizeDatabaseUrl(process.env.DATABASE_URL);
 
 export const pool =
   globalForDb.pool ??
