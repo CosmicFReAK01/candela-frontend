@@ -4,7 +4,7 @@ import Link from "next/link";
 import { openPositions } from "@/data/site";
 import { Container } from "./Container";
 import { SectionHeading } from "./SectionHeading";
-import { ArrowRight, MapPin, Briefcase, CheckCircle2, X, Upload, Loader2 } from "lucide-react";
+import { ArrowRight, MapPin, Briefcase, CheckCircle2, X, Upload, Loader2, AlertCircle } from "lucide-react";
 import { submitJobApplication, fetchCareers, ApplicationResponse } from "@/lib/api";
 import { useEffect } from "react";
 
@@ -13,6 +13,7 @@ export function CareersSection({ content }: { content?: any }) {
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [applicationResult, setApplicationResult] = useState<ApplicationResponse | null>(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -35,12 +36,14 @@ export function CareersSection({ content }: { content?: any }) {
     setSelectedJob(title);
     setFormData((prev) => ({ ...prev, position: title }));
     setSubmitted(false);
+    setError(null);
     setApplicationResult(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setError(null);
     try {
       const res = await submitJobApplication({
         positionTitle: selectedJob || "Engineering Candidate",
@@ -52,8 +55,9 @@ export function CareersSection({ content }: { content?: any }) {
       });
       setApplicationResult(res);
       setSubmitted(true);
-    } catch {
-      setSubmitted(true);
+    } catch (err: any) {
+      console.error("Job Application submission error:", err);
+      setError(err.message || "Failed to submit application. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -62,6 +66,7 @@ export function CareersSection({ content }: { content?: any }) {
   const handleClose = () => {
     setSelectedJob(null);
     setSubmitted(false);
+    setError(null);
     setApplicationResult(null);
     setFormData({ name: "", email: "", phone: "", position: "", experience: "", location: "" });
   };
@@ -251,6 +256,14 @@ export function CareersSection({ content }: { content?: any }) {
                       <span className="text-[11px] text-[#4A4D50]">Click to attach file or drag & drop</span>
                     </div>
                   </div>
+
+                  {/* Error Banner */}
+                  {error && (
+                    <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg flex items-center gap-2 font-sans">
+                      <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+                      <span>{error}</span>
+                    </div>
+                  )}
 
                   <button
                     type="submit"

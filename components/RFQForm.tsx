@@ -1,11 +1,12 @@
 "use client";
 import { useState } from "react";
-import { CheckCircle2, Upload, Send, Loader2 } from "lucide-react";
+import { CheckCircle2, Upload, Send, Loader2, AlertCircle } from "lucide-react";
 import { submitRfq, RfqResponse } from "@/lib/api";
 
 export function RFQForm() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [rfqResult, setRfqResult] = useState<RfqResponse | null>(null);
   const [projectType, setProjectType] = useState("Cross Country Pipeline");
   const [formData, setFormData] = useState({
@@ -31,6 +32,7 @@ export function RFQForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setError(null);
     try {
       const res = await submitRfq({
         ...formData,
@@ -38,8 +40,9 @@ export function RFQForm() {
       });
       setRfqResult(res);
       setSubmitted(true);
-    } catch {
-      setSubmitted(true);
+    } catch (err: any) {
+      console.error("RFQ submission error:", err);
+      setError(err.message || "Failed to submit RFQ. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -47,6 +50,7 @@ export function RFQForm() {
 
   const handleReset = () => {
     setSubmitted(false);
+    setError(null);
     setRfqResult(null);
     setFormData({
       companyName: "",
@@ -279,6 +283,14 @@ export function RFQForm() {
               <div className="text-[10px] text-[#787B7E] mt-0.5">Encrypted & kept strictly confidential under EPC NDA</div>
             </div>
           </div>
+
+          {/* Error Banner */}
+          {error && (
+            <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2.5 font-sans">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+              <span>{error}</span>
+            </div>
+          )}
 
           {/* Submit Button */}
           <button
