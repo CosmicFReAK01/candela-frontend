@@ -70,6 +70,12 @@ export async function GET(req: Request, { params }: RouteProps) {
         return NextResponse.json(rows[0] || null);
       }
 
+      case "leadership":
+      case "executive_leadership": {
+        const rows = await query(`SELECT * FROM executive_leadership ORDER BY display_order ASC, id ASC;`);
+        return NextResponse.json(rows);
+      }
+
       default:
         return NextResponse.json({ error: `Unknown module '${module}'` }, { status: 400 });
     }
@@ -232,6 +238,17 @@ export async function POST(req: Request, { params }: RouteProps) {
              is_tier1 = EXCLUDED.is_tier1
            RETURNING *;`,
           [code, body.name, body.sector || "Energy & Hydrocarbon", body.logo_url || "", body.is_tier1 ?? true]
+        );
+        return NextResponse.json({ success: true, data: rows[0] });
+      }
+
+      case "leadership":
+      case "executive_leadership": {
+        const rows = await query(
+          `INSERT INTO executive_leadership (name, role, background, experience, display_order)
+           VALUES ($1, $2, $3, $4, $5)
+           RETURNING *;`,
+          [body.name, body.role, body.background, body.experience || "", body.display_order || 0]
         );
         return NextResponse.json({ success: true, data: rows[0] });
       }
@@ -477,6 +494,23 @@ export async function PUT(req: Request, { params }: RouteProps) {
         return NextResponse.json({ success: true, data: rows[0] });
       }
 
+      case "leadership":
+      case "executive_leadership": {
+        const id = body.id;
+        const rows = await query(
+          `UPDATE executive_leadership SET
+             name = COALESCE($1, name),
+             role = COALESCE($2, role),
+             background = COALESCE($3, background),
+             experience = COALESCE($4, experience),
+             display_order = COALESCE($5, display_order),
+             updated_at = NOW()
+           WHERE id::text = $6::text RETURNING *;`,
+          [body.name, body.role, body.background, body.experience, body.display_order, id]
+        );
+        return NextResponse.json({ success: true, data: rows[0] });
+      }
+
       default:
         return NextResponse.json({ error: `Unknown module '${module}'` }, { status: 400 });
     }
@@ -539,6 +573,12 @@ export async function DELETE(req: Request, { params }: RouteProps) {
       case "applications": {
         await query(`DELETE FROM job_applications WHERE id::text = $1::text;`, [id]);
         return NextResponse.json({ success: true, message: `Application ${id} deleted` });
+      }
+
+      case "leadership":
+      case "executive_leadership": {
+        await query(`DELETE FROM executive_leadership WHERE id::text = $1::text;`, [id]);
+        return NextResponse.json({ success: true, message: `Leader ${id} deleted` });
       }
 
       default:

@@ -26,13 +26,18 @@ export default async function AboutPage() {
   ] : stats;
 
   let aboutContent: any = null;
+  let leadershipFromDb: any[] | null = null;
   try {
     const rows = await query("SELECT about_content FROM site_settings WHERE id = 'default'");
     if (rows && rows.length > 0 && rows[0].about_content) {
       aboutContent = rows[0].about_content;
     }
+    const leaderRows = await query("SELECT * FROM executive_leadership ORDER BY display_order ASC, id ASC;");
+    if (leaderRows && leaderRows.length > 0) {
+      leadershipFromDb = leaderRows;
+    }
   } catch (err) {
-    console.error("Failed to load about_content:", err);
+    console.error("Failed to load about_content or executive_leadership:", err);
   }
 
   // Heritage defaults
@@ -130,9 +135,11 @@ export default async function AboutPage() {
         }
       ];
 
-  const leadershipList = Array.isArray(aboutContent?.leadership) && aboutContent.leadership.length > 0
-    ? aboutContent.leadership
-    : fallbackLeadership;
+  const leadershipList = leadershipFromDb && leadershipFromDb.length > 0
+    ? leadershipFromDb
+    : (Array.isArray(aboutContent?.leadership) && aboutContent.leadership.length > 0
+      ? aboutContent.leadership
+      : fallbackLeadership);
 
   // Why Choose Us defaults
   const whyUsList = Array.isArray(aboutContent?.whyChooseUs) && aboutContent.whyChooseUs.length > 0
