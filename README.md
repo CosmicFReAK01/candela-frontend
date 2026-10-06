@@ -252,16 +252,7 @@ Visit the application at:
 - **Public Portal**: [http://localhost:3000](http://localhost:3000)
 - **Admin Console**: [http://localhost:3000/admin](http://localhost:3000/admin)
 
----
-
-## 🔐 Administrative Credentials
-
-| Credential | Value | Description |
-|:---|:---|:---|
-| **Default Password** | `CandelaAdmin#2026!` | Primary password for `/admin`. Can be updated in the portal. |
-| **Master Recovery Key** | `CANDELA-REC-3F62-BCD5-7FC9-46A7` | Break-glass override key. Terminates all other sessions and restores access. |
-
----
+---X---
 
 ## 🛠 Engineering Standards & Compliance
 - **Pipeline Design**: ASME B31.8 (Gas Transmission & Distribution Systems)
