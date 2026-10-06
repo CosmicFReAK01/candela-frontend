@@ -74,14 +74,7 @@ export const stats = [
 
 /* ──────────────── Tier-1 Clients ──────────────── */
 export const clients = [
-  { name: "GAIL (India) Limited", sector: "National Gas Transmission", logoText: "GAIL" },
   { name: "Indian Oil Corporation (IOCL)", sector: "Refinery & Hydrocarbon Pipelines", logoText: "IOCL" },
-  { name: "Oil & Natural Gas Corp (ONGC)", sector: "Upstream & Offshore Tie-Ins", logoText: "ONGC" },
-  { name: "Adani Total Gas Ltd", sector: "City Gas Distribution Networks", logoText: "ATGL" },
-  { name: "Torrent Gas Ltd", sector: "Urban CGD & CNG Infrastructure", logoText: "TORRENT" },
-  { name: "Gujarat State Petronet (GSPL)", sector: "State Gas Grid Trunklines", logoText: "GSPL" },
-  { name: "Bharat Petroleum (BPCL)", sector: "Cross-Country Product Lines", logoText: "BPCL" },
-  { name: "Hindustan Petroleum (HPCL)", sector: "Terminal & Distribution Pipelines", logoText: "HPCL" },
 ];
 
 /* ──────────────── Complete 10 Core Services ──────────────── */

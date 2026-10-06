@@ -2,15 +2,11 @@ import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { Stats } from "@/components/Stats";
 import { AboutSection } from "@/components/AboutSection";
-import { Services } from "@/components/Services";
 import { FeaturedProjects } from "@/components/FeaturedProjects";
 import { IndiaMap } from "@/components/IndiaMap";
 import { Process } from "@/components/Process";
 import { HSE } from "@/components/HSE";
-import { Fleet } from "@/components/Fleet";
-import { ClientsSection } from "@/components/ClientsSection";
 import { WhyChooseUs } from "@/components/WhyChooseUs";
-import { CareersSection } from "@/components/CareersSection";
 import { RFQForm } from "@/components/RFQForm";
 import { Footer } from "@/components/Footer";
 import { Container } from "@/components/Container";
@@ -53,9 +49,6 @@ export default async function Home() {
         {/* 3. About Company (Image + Story) */}
         <AboutSection content={homeContent.aboutCompany} />
 
-        {/* 4. Our Services (Interactive Cards) */}
-        <Services content={homeContent.servicesSection} />
-
         {/* 5. Featured Projects (Large Case Studies) */}
         <FeaturedProjects content={homeContent.projectsSection} />
 
@@ -68,17 +61,8 @@ export default async function Home() {
         {/* 8. HSE & Quality Management */}
         <HSE content={homeContent.hseSection} />
 
-        {/* 9. Equipment & Technology */}
-        <Fleet content={homeContent.fleetSection} />
-
-        {/* 10. Our Clients */}
-        <ClientsSection content={homeContent.clientsSection} />
-
         {/* 11. Why Choose Us */}
         <WhyChooseUs content={homeContent.whyUsSection} />
-
-        {/* 12. Careers / Join Us */}
-        <CareersSection content={homeContent.careersSection} />
 
         {/* 13. Request a Quote (RFQ) & Tender Section */}
         <section id="contact" className="py-20 lg:py-28 bg-[#F8F4EC] border-b border-[#D9D9D9]">
