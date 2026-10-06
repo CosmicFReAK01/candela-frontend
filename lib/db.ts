@@ -19,8 +19,11 @@ function sanitizeDatabaseUrl(url: string | undefined): string | undefined {
   return clean;
 }
 
-const SUPABASE_DB_URL = "postgresql://postgres.xgsnlssgcdzoipjmegbx:CandelaDb%232026!@aws-0-ap-southeast-2.pooler.supabase.com:6543/postgres";
-const connectionString = sanitizeDatabaseUrl(process.env.DATABASE_URL) || SUPABASE_DB_URL;
+// Credentials must come from the environment (.env.local / Vercel env vars) — never hardcode them.
+const connectionString = sanitizeDatabaseUrl(process.env.DATABASE_URL);
+if (!connectionString) {
+  throw new Error("DATABASE_URL is not set. Add it to .env.local (local) or your hosting provider's environment variables.");
+}
 
 const isServerless = !!process.env.VERCEL || process.env.NODE_ENV === "production";
 

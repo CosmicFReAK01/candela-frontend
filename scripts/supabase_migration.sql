@@ -22,7 +22,8 @@ SET row_security = off;
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
 --
 
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+CREATE SCHEMA IF NOT EXISTS extensions;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA extensions;
 
 
 --
@@ -60,7 +61,7 @@ CREATE TABLE public.admin_auth (
 --
 
 CREATE TABLE public.client_approvals (
-    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     client_id uuid NOT NULL,
     standard_code character varying(64) NOT NULL,
     approved_scope text NOT NULL,
@@ -73,7 +74,7 @@ CREATE TABLE public.client_approvals (
 --
 
 CREATE TABLE public.clients (
-    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     code character varying(32) NOT NULL,
     name character varying(255) NOT NULL,
     sector character varying(128) NOT NULL,
@@ -103,7 +104,7 @@ CREATE TABLE public.corporate_news (
 --
 
 CREATE TABLE public.district_corridors (
-    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     slug character varying(64) NOT NULL,
     district_name character varying(128) NOT NULL,
     state_name character varying(64) DEFAULT 'Bihar'::character varying NOT NULL,
@@ -137,7 +138,7 @@ CREATE TABLE public.equipment (
 --
 
 CREATE TABLE public.equipment_categories (
-    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     category_name character varying(128) NOT NULL,
     description text
 );
@@ -148,7 +149,7 @@ CREATE TABLE public.equipment_categories (
 --
 
 CREATE TABLE public.equipment_deployments (
-    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     spread_camp_id uuid NOT NULL,
     equipment_id uuid NOT NULL,
     units_deployed integer DEFAULT 1 NOT NULL,
@@ -162,7 +163,7 @@ CREATE TABLE public.equipment_deployments (
 --
 
 CREATE TABLE public.fleet_equipment (
-    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     category_id uuid NOT NULL,
     model_name character varying(128) NOT NULL,
     manufacturer character varying(128) NOT NULL,
@@ -179,7 +180,7 @@ CREATE TABLE public.fleet_equipment (
 --
 
 CREATE TABLE public.hse_metrics (
-    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     recorded_date date NOT NULL,
     safe_man_hours numeric(10,2) NOT NULL,
     ltifr numeric(4,2) DEFAULT 0.00,
@@ -421,7 +422,7 @@ CREATE TABLE public.state_footprints (
 --
 
 CREATE TABLE public.sub_districts (
-    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     district_id uuid NOT NULL,
     sub_district_name character varying(128) NOT NULL,
     block_type character varying(64) DEFAULT 'Tehsil'::character varying NOT NULL,
@@ -436,7 +437,7 @@ CREATE TABLE public.sub_districts (
 --
 
 CREATE TABLE public.tender_enquiries (
-    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     reference_number character varying(32) NOT NULL,
     company_name character varying(255) NOT NULL,
     contact_name character varying(128) NOT NULL,

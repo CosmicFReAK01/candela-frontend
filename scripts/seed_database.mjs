@@ -122,7 +122,7 @@ VALUES (${esc(j.id)}, ${esc(j.title)}, ${esc(j.department)}, ${esc(j.location)},
 VALUES (${esc(st.id)}, ${esc(st.name)}, ${spreadsNum}, ${kmNum}, 'Active Operations');\n`;
 
     sql += `INSERT INTO district_corridors (id, slug, district_name, state_name, regional_hub, total_pipeline_laid_km, active_spreads_count, hdd_rigs_deployed, is_active)
-VALUES (uuid_generate_v4(), ${esc(st.id)}, ${esc(st.name)}, 'Bihar', ${esc(st.activeSites?.[0] || 'Central Base')}, ${kmNum}, ${spreadsNum}, 4, true)
+VALUES (gen_random_uuid(), ${esc(st.id)}, ${esc(st.name)}, 'Bihar', ${esc(st.activeSites?.[0] || 'Central Base')}, ${kmNum}, ${spreadsNum}, 4, true)
 ON CONFLICT (slug) DO UPDATE SET
   district_name = EXCLUDED.district_name,
   regional_hub = EXCLUDED.regional_hub,
@@ -132,7 +132,7 @@ ON CONFLICT (slug) DO UPDATE SET
     if (st.subDistricts && Array.isArray(st.subDistricts)) {
       for (const sub of st.subDistricts) {
         sql += `INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, ${esc(sub)}, 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, ${esc(sub)}, 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = ${esc(st.id)};\n`;
       }
     }

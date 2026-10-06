@@ -254,122 +254,122 @@ VALUES ('cgd-06', 'City Gas Distribution (CGD) Project Engineer', 'Urban Infrast
 INSERT INTO state_footprints (id, name, projects, km, status)
 VALUES ('saran-chapra', 'Saran (Chapra)', 14, 340, 'Active Operations');
 INSERT INTO district_corridors (id, slug, district_name, state_name, regional_hub, total_pipeline_laid_km, active_spreads_count, hdd_rigs_deployed, is_active)
-VALUES (uuid_generate_v4(), 'saran-chapra', 'Saran (Chapra)', 'Bihar', 'Chapra Sadar Hub', 340, 14, 4, true)
+VALUES (gen_random_uuid(), 'saran-chapra', 'Saran (Chapra)', 'Bihar', 'Chapra Sadar Hub', 340, 14, 4, true)
 ON CONFLICT (slug) DO UPDATE SET
   district_name = EXCLUDED.district_name,
   regional_hub = EXCLUDED.regional_hub,
   total_pipeline_laid_km = EXCLUDED.total_pipeline_laid_km,
   active_spreads_count = EXCLUDED.active_spreads_count;
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Chapra Sadar', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Chapra Sadar', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'saran-chapra';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Marhaura', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Marhaura', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'saran-chapra';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Sonpur', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Sonpur', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'saran-chapra';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Revelganj', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Revelganj', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'saran-chapra';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Dighwara', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Dighwara', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'saran-chapra';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Garkha', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Garkha', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'saran-chapra';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Manjhi', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Manjhi', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'saran-chapra';
 INSERT INTO state_footprints (id, name, projects, km, status)
 VALUES ('vaishali', 'Vaishali (Hajipur)', 11, 285, 'Active Operations');
 INSERT INTO district_corridors (id, slug, district_name, state_name, regional_hub, total_pipeline_laid_km, active_spreads_count, hdd_rigs_deployed, is_active)
-VALUES (uuid_generate_v4(), 'vaishali', 'Vaishali (Hajipur)', 'Bihar', 'Hajipur Industrial Area', 285, 11, 4, true)
+VALUES (gen_random_uuid(), 'vaishali', 'Vaishali (Hajipur)', 'Bihar', 'Hajipur Industrial Area', 285, 11, 4, true)
 ON CONFLICT (slug) DO UPDATE SET
   district_name = EXCLUDED.district_name,
   regional_hub = EXCLUDED.regional_hub,
   total_pipeline_laid_km = EXCLUDED.total_pipeline_laid_km,
   active_spreads_count = EXCLUDED.active_spreads_count;
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Hajipur Sadar', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Hajipur Sadar', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'vaishali';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Lalganj', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Lalganj', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'vaishali';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Mahua', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Mahua', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'vaishali';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Vaishali', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Vaishali', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'vaishali';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Bidupur', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Bidupur', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'vaishali';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Jandaha', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Jandaha', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'vaishali';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Raghopur', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Raghopur', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'vaishali';
 INSERT INTO state_footprints (id, name, projects, km, status)
 VALUES ('muzaffarpur', 'Muzaffarpur', 16, 420, 'Active Operations');
 INSERT INTO district_corridors (id, slug, district_name, state_name, regional_hub, total_pipeline_laid_km, active_spreads_count, hdd_rigs_deployed, is_active)
-VALUES (uuid_generate_v4(), 'muzaffarpur', 'Muzaffarpur', 'Bihar', 'Kanti Thermal Power Complex', 420, 16, 4, true)
+VALUES (gen_random_uuid(), 'muzaffarpur', 'Muzaffarpur', 'Bihar', 'Kanti Thermal Power Complex', 420, 16, 4, true)
 ON CONFLICT (slug) DO UPDATE SET
   district_name = EXCLUDED.district_name,
   regional_hub = EXCLUDED.regional_hub,
   total_pipeline_laid_km = EXCLUDED.total_pipeline_laid_km,
   active_spreads_count = EXCLUDED.active_spreads_count;
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Muzaffarpur Sadar', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Muzaffarpur Sadar', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'muzaffarpur';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Kanti', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Kanti', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'muzaffarpur';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Motipur', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Motipur', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'muzaffarpur';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Sakra', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Sakra', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'muzaffarpur';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Marwan', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Marwan', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'muzaffarpur';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Sahebganj', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Sahebganj', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'muzaffarpur';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Kurhani', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Kurhani', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'muzaffarpur';
 INSERT INTO state_footprints (id, name, projects, km, status)
 VALUES ('samastipur', 'Samastipur', 9, 245, 'Active Operations');
 INSERT INTO district_corridors (id, slug, district_name, state_name, regional_hub, total_pipeline_laid_km, active_spreads_count, hdd_rigs_deployed, is_active)
-VALUES (uuid_generate_v4(), 'samastipur', 'Samastipur', 'Bihar', 'Samastipur City Gate Station', 245, 9, 4, true)
+VALUES (gen_random_uuid(), 'samastipur', 'Samastipur', 'Bihar', 'Samastipur City Gate Station', 245, 9, 4, true)
 ON CONFLICT (slug) DO UPDATE SET
   district_name = EXCLUDED.district_name,
   regional_hub = EXCLUDED.regional_hub,
   total_pipeline_laid_km = EXCLUDED.total_pipeline_laid_km,
   active_spreads_count = EXCLUDED.active_spreads_count;
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Samastipur Sadar', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Samastipur Sadar', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'samastipur';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Dalsinghsarai', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Dalsinghsarai', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'samastipur';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Rosera', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Rosera', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'samastipur';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Pusa', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Pusa', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'samastipur';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Kalyanpur', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Kalyanpur', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'samastipur';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Ujiarpur', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Ujiarpur', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'samastipur';
 INSERT INTO sub_districts (id, district_id, sub_district_name, block_type, corridor_km, terrain_classification)
-SELECT uuid_generate_v4(), id, 'Singhia', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
+SELECT gen_random_uuid(), id, 'Singhia', 'Tehsil', 45.0, 'Alluvial Plain / RoW'
 FROM district_corridors WHERE slug = 'samastipur';
 
 COMMIT;
