@@ -254,7 +254,7 @@ export function IndiaMap({ content }: { content?: any }) {
                       SUB-DISTRICTS (TEHSILS / BLOCKS):
                     </div>
                     <div className="flex flex-wrap gap-1.5">
-                      {activeState.subDistricts.map((sub) => (
+                      {activeState.subDistricts.map((sub: string) => (
                         <span
                           key={sub}
                           className="bg-[#F3EFE7] text-[#242424] text-[11px] px-2.5 py-0.5 rounded font-mono border border-[#D9D9D9]"
@@ -272,7 +272,7 @@ export function IndiaMap({ content }: { content?: any }) {
                     ACTIVE SPREAD LOCATIONS & CAMPS:
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {activeState.activeSites.map((site) => (
+                    {activeState.activeSites.map((site: string) => (
                       <span
                         key={site}
                         className="bg-[#F8F4EC] text-[#242424] text-xs px-2.5 py-1 rounded border border-[#D9D9D9] font-mono flex items-center gap-1.5"
