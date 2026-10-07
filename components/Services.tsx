@@ -58,7 +58,7 @@ export function Services({ content }: { content?: any }) {
                     {s.n}
                   </span>
                   <span className="text-[10px] font-mono text-[#5A5E62] bg-[#F8F4EC] px-2 py-0.5 rounded border border-[#D9D9D9]">
-                    {s.standard.split("/")[0]}
+                    {(s.standard || "").split("/")[0]}
                   </span>
                 </div>
 
@@ -74,7 +74,7 @@ export function Services({ content }: { content?: any }) {
 
                 {/* Bullet points */}
                 <ul className="mt-4 space-y-1.5 text-[11px] text-[#6B6F73]">
-                  {s.bullets.slice(0, 3).map((b, idx) => (
+                  {(s.bullets || []).slice(0, 3).map((b, idx) => (
                     <li key={idx} className="flex items-start gap-1.5">
                       <span className="text-[#C69C6D] text-xs font-bold leading-none">•</span>
                       <span>{b}</span>

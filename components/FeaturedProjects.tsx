@@ -53,7 +53,7 @@ export function FeaturedProjects({ content }: { content?: any }) {
               }`}
             >
               <span>CASE 0{idx + 1}:</span>
-              <span>{p.title.split("(")[0]}</span>
+              <span>{(p.title || "").split("(")[0]}</span>
             </button>
           ))}
         </div>
@@ -94,7 +94,7 @@ export function FeaturedProjects({ content }: { content?: any }) {
                   KEY EXECUTION HIGHLIGHTS:
                 </div>
                 <div className="grid sm:grid-cols-2 gap-2 text-xs text-[#333333]">
-                  {current.highlights.slice(0, 4).map((h, i) => (
+                  {(current.highlights || []).slice(0, 4).map((h, i) => (
                     <div key={i} className="flex items-start gap-2">
                       <CheckCircle2 className="w-3.5 h-3.5 text-[#9E7444] mt-0.5 shrink-0" />
                       <span>{h}</span>

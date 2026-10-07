@@ -81,7 +81,7 @@ export function Navbar() {
           <div className="flex items-center gap-3">
             {/* ISO Certifications */}
             <div className="flex items-center gap-1.5 text-[#5A5E62] font-mono text-[11px]">
-              {settings.iso_badges.split(",").map((badge, idx) => (
+              {(settings.iso_badges || "").split(",").map((badge, idx) => (
                 <span key={idx} className="px-1.5 py-0.5 bg-white rounded border border-[#D9D9D9] shadow-xs">
                   {badge.trim()}
                 </span>

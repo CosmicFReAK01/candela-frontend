@@ -274,7 +274,7 @@ export function IndiaMap({ content }: { content?: any }) {
                     ACTIVE SPREAD LOCATIONS & CAMPS:
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {activeState.activeSites.map((site: string) => (
+                    {(activeState.activeSites || []).map((site: string) => (
                       <span
                         key={site}
                         className="bg-[#F8F4EC] text-[#242424] text-xs px-2.5 py-1 rounded border border-[#D9D9D9] font-mono flex items-center gap-1.5"
@@ -292,7 +292,7 @@ export function IndiaMap({ content }: { content?: any }) {
                     href={`/projects?district=${encodeURIComponent(activeState.name)}`}
                     className="w-full bg-[#C69C6D] hover:bg-[#B08554] text-[#242424] font-bold py-3 px-4 rounded-xl text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-sm shadow-[#C69C6D]/20 active:scale-95"
                   >
-                    <span>VIEW {activeState.name.toUpperCase()} PROJECTS & SPREADS</span>
+                    <span>VIEW {(activeState.name || "").toUpperCase()} PROJECTS & SPREADS</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>

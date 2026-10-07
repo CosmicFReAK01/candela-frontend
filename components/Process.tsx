@@ -92,7 +92,7 @@ export function Process({ content }: { content?: any }) {
                     PHASE DELIVERABLES & VERIFICATIONS:
                   </div>
                   <div className="grid sm:grid-cols-3 gap-2">
-                    {current.deliverables.map((d, i) => (
+                    {(current?.deliverables || []).map((d, i) => (
                       <div
                         key={i}
                         className="bg-[#F8F4EC] border border-[#D9D9D9] px-3 py-2 rounded-lg text-xs text-[#242424] flex items-center gap-2"

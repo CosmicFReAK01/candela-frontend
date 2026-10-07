@@ -22,7 +22,7 @@ export default async function AboutPage() {
     { value: dbStats.totalKmConstructed || stats[0].value, label: stats[0].label },
     { value: dbStats.hddCrossingsRecord ? `${dbStats.hddCrossingsRecord}` : stats[1].value, label: stats[1].label },
     { value: dbStats.safeManHoursMillions || stats[2].value, label: stats[2].label },
-    { value: dbStats.activeSpreads || stats[3].value, label: stats[3].label },
+    { value: dbStats.activeSpreads ? `${dbStats.activeSpreads}` : stats[3].value, label: dbStats.activeSpreads ? "Active Pipeline Spreads" : stats[3].label },
   ] : stats;
 
   let aboutContent: any = null;
