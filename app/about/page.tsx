@@ -135,11 +135,9 @@ export default async function AboutPage() {
         }
       ];
 
-  const leadershipList = leadershipFromDb 
-    ? leadershipFromDb
-    : (Array.isArray(aboutContent?.leadership) && aboutContent.leadership.length > 0
-      ? aboutContent.leadership
-      : fallbackLeadership);
+  const leadershipList = Array.isArray(aboutContent?.leadership)
+    ? aboutContent.leadership
+    : (leadershipFromDb || fallbackLeadership);
 
   // Why Choose Us defaults
   const whyUsList = Array.isArray(aboutContent?.whyChooseUs) && aboutContent.whyChooseUs.length > 0
