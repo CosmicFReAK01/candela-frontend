@@ -3,7 +3,7 @@
  * Connects Next.js Frontend to Spring Boot Microservices through API Gateway (Port 8080)
  */
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || (typeof process !== "undefined" && process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
 export interface RfqPayload {
   companyName: string;
