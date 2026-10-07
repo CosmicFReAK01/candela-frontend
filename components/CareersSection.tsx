@@ -26,7 +26,7 @@ export function CareersSection({ content }: { content?: any }) {
 
   useEffect(() => {
     fetchCareers().then((data) => {
-      if (data && Array.isArray(data) ) {
+      if (data && Array.isArray(data) && data.length > 0) {
         setPositions(data);
       }
     });

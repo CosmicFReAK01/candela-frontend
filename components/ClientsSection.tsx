@@ -13,7 +13,7 @@ export function ClientsSection({ content }: { content?: any }) {
     fetch("/api/clients", { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data && Array.isArray(data) ) {
+        if (data && Array.isArray(data) && data.length > 0) {
           setClientList(data);
         }
       })

@@ -13,7 +13,7 @@ export function FeaturedProjects({ content }: { content?: any }) {
 
   useEffect(() => {
     fetchProjects().then((data) => {
-      if (data && Array.isArray(data) ) {
+      if (data && Array.isArray(data) && data.length > 0) {
         setProjectList(data);
       }
     });
@@ -21,8 +21,6 @@ export function FeaturedProjects({ content }: { content?: any }) {
 
   const featuredList = projectList.slice(0, 3);
   const current = featuredList[selectedIdx] || featuredList[0];
-
-  if (!current) return null;
 
   return (
     <section id="projects" className="py-20 lg:py-28 bg-[#F8F4EC] border-b border-[#D9D9D9]">
@@ -96,7 +94,7 @@ export function FeaturedProjects({ content }: { content?: any }) {
                   KEY EXECUTION HIGHLIGHTS:
                 </div>
                 <div className="grid sm:grid-cols-2 gap-2 text-xs text-[#333333]">
-                  {(current.highlights || []).slice(0, 4).map((h: string, i: number) => (
+                  {current.highlights.slice(0, 4).map((h, i) => (
                     <div key={i} className="flex items-start gap-2">
                       <CheckCircle2 className="w-3.5 h-3.5 text-[#9E7444] mt-0.5 shrink-0" />
                       <span>{h}</span>

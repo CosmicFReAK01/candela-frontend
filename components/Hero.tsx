@@ -13,7 +13,7 @@ export function Hero({ content }: { content?: any }) {
 
   useEffect(() => {
     fetchClients().then(data => {
-      if (data && Array.isArray(data) ) {
+      if (data && Array.isArray(data) && data.length > 0) {
         setClientList(data);
       }
     });

@@ -14,7 +14,7 @@ export function Services({ content }: { content?: any }) {
 
   useEffect(() => {
     fetchServices().then((data) => {
-      if (data && Array.isArray(data) ) {
+      if (data && Array.isArray(data) && data.length > 0) {
         setServiceList(data);
       }
     });
