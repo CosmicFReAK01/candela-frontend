@@ -292,3 +292,13 @@ export async function fetchHse() {
     return null;
   }
 }
+
+export async function fetchClients() {
+  try {
+    const res = await fetch(`${typeof window !== "undefined" ? "" : API_BASE_URL}/api/clients`, { cache: "no-store" });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}

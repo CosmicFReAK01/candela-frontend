@@ -18,7 +18,7 @@ export default async function NewsPage() {
   let newsList: any[] = [];
   try {
     const rows = await query("SELECT * FROM corporate_news ORDER BY id DESC;");
-    if (rows && rows.length > 0) {
+    if (rows ) {
       newsList = rows;
     }
   } catch (err) {

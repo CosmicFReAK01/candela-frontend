@@ -19,7 +19,7 @@ export default async function ClientsPage() {
   let clientList: any[] = [];
   try {
     const rows = await query("SELECT * FROM clients ORDER BY name ASC;");
-    if (rows && rows.length > 0) {
+    if (rows ) {
       clientList = rows;
     }
   } catch (err) {

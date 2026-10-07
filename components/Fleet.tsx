@@ -15,7 +15,7 @@ export function Fleet({ content }: { content?: any }) {
     fetch("/api/fleet", { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data && Array.isArray(data) && data.length > 0) {
+        if (data && Array.isArray(data) ) {
           setEquipmentList(data);
         }
       })

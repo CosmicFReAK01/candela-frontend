@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default async function ServicesPage() {
   const servicesFromApi = await fetchServices();
-  const serviceList = (servicesFromApi && Array.isArray(servicesFromApi) && servicesFromApi.length > 0
+  const serviceList = (servicesFromApi && Array.isArray(servicesFromApi) 
     ? servicesFromApi
     : services
   ).map((s: any) => {

@@ -14,7 +14,7 @@ export function IndiaMap({ content }: { content?: any }) {
 
   useEffect(() => {
     fetchStates().then((dbStates) => {
-      if (dbStates && Array.isArray(dbStates) && dbStates.length > 0) {
+      if (dbStates && Array.isArray(dbStates) ) {
         setStates((prev) =>
           prev.map((s) => {
             const found = dbStates.find(

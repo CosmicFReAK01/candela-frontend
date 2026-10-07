@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default async function ProjectsPage() {
   const dynamicProjects = await fetchProjects();
-  const projectList = dynamicProjects && dynamicProjects.length > 0 ? dynamicProjects : fallbackProjects;
+  const projectList = dynamicProjects  ? dynamicProjects : fallbackProjects;
   return (
     <>
       <Navbar />

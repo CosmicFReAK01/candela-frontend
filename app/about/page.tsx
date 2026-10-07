@@ -29,11 +29,11 @@ export default async function AboutPage() {
   let leadershipFromDb: any[] | null = null;
   try {
     const rows = await query("SELECT about_content FROM site_settings WHERE id = 'default'");
-    if (rows && rows.length > 0 && rows[0].about_content) {
+    if (rows  && rows[0].about_content) {
       aboutContent = rows[0].about_content;
     }
     const leaderRows = await query("SELECT * FROM executive_leadership ORDER BY display_order ASC, id ASC;");
-    if (leaderRows && leaderRows.length > 0) {
+    if (leaderRows ) {
       leadershipFromDb = leaderRows;
     }
   } catch (err) {
@@ -135,7 +135,7 @@ export default async function AboutPage() {
         }
       ];
 
-  const leadershipList = leadershipFromDb && leadershipFromDb.length > 0
+  const leadershipList = leadershipFromDb 
     ? leadershipFromDb
     : (Array.isArray(aboutContent?.leadership) && aboutContent.leadership.length > 0
       ? aboutContent.leadership

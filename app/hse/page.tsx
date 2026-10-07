@@ -19,7 +19,7 @@ export default async function HSEPage() {
   let dbHse: any = null;
   try {
     const rows = await query("SELECT * FROM hse_metrics ORDER BY recorded_date DESC LIMIT 1;");
-    if (rows && rows.length > 0) {
+    if (rows ) {
       dbHse = rows[0];
     }
   } catch (err) {

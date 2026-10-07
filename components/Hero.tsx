@@ -4,10 +4,20 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Container } from "./Container";
 import { ArrowRight, Activity, ShieldCheck, MapPin, Gauge } from "lucide-react";
-import { clients } from "@/data/site";
+import { clients as fallbackClients } from "@/data/site";
+import { fetchClients } from "@/lib/api";
 
 export function Hero({ content }: { content?: any }) {
   const [pressure, setPressure] = useState(98.3);
+  const [clientList, setClientList] = useState(fallbackClients);
+
+  useEffect(() => {
+    fetchClients().then(data => {
+      if (data && Array.isArray(data) ) {
+        setClientList(data);
+      }
+    });
+  }, []);
 
   const pillText = content?.pillText || "Pan-India Pipeline EPC & Infrastructure Contractor";
   const pillBadge = content?.pillBadge || "ASME B31.8 / API 1104";
@@ -305,9 +315,9 @@ export function Hero({ content }: { content?: any }) {
               TRUSTED BY NATIONAL OPERATORS:
             </div>
             <div className="flex flex-wrap items-center gap-6 sm:gap-10 text-xs sm:text-sm font-bold text-[#242424]">
-              {clients.map((c) => (
-                <span key={c.name} className="hover:text-[#9E7444] transition-colors cursor-default">
-                  {c.logoText}
+              {clientList.map((c: any) => (
+                <span key={c.id || c.name} className="hover:text-[#9E7444] transition-colors cursor-default">
+                  {c.logoText || c.name.slice(0, 5).toUpperCase()}
                 </span>
               ))}
             </div>
