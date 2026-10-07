@@ -3,7 +3,7 @@
  * Connects Next.js Frontend to Spring Boot Microservices through API Gateway (Port 8080)
  */
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
 export interface RfqPayload {
   companyName: string;
@@ -82,7 +82,7 @@ export interface ApplicationResponse {
 
 // ── Tendering & Cost Estimator API ──
 export async function submitRfq(data: RfqPayload): Promise<RfqResponse> {
-  const url = typeof window !== "undefined" ? "/api/rfq" : `${API_BASE_URL}/api/rfq`;
+  const url = typeof window !== "undefined" ? "/api/rfq" : `${typeof window !== "undefined" ? "" : API_BASE_URL}/api/rfq`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -97,7 +97,7 @@ export async function submitRfq(data: RfqPayload): Promise<RfqResponse> {
 
 export async function calculateEstimate(payload: CalculatorPayload): Promise<CalculatorResult> {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/calculator/estimate`, {
+    const res = await fetch(`${typeof window !== "undefined" ? "" : API_BASE_URL}/api/calculator/estimate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -134,7 +134,7 @@ export async function calculateEstimate(payload: CalculatorPayload): Promise<Cal
 // ── SCADA Telemetry & Operations API ──
 export async function fetchScadaTelemetry(): Promise<TelemetryData | null> {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/scada/telemetry`, { cache: "no-store" });
+    const res = await fetch(`${typeof window !== "undefined" ? "" : API_BASE_URL}/api/scada/telemetry`, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -144,7 +144,7 @@ export async function fetchScadaTelemetry(): Promise<TelemetryData | null> {
 
 export async function tripScadaStation(stationId: string = "SV-04"): Promise<boolean> {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/scada/trip?stationId=${stationId}`, { method: "POST" });
+    const res = await fetch(`${typeof window !== "undefined" ? "" : API_BASE_URL}/api/scada/trip?stationId=${stationId}`, { method: "POST" });
     return res.ok;
   } catch {
     return false;
@@ -153,7 +153,7 @@ export async function tripScadaStation(stationId: string = "SV-04"): Promise<boo
 
 export async function resetScadaStation(stationId: string = "SV-04"): Promise<boolean> {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/scada/reset?stationId=${stationId}`, { method: "POST" });
+    const res = await fetch(`${typeof window !== "undefined" ? "" : API_BASE_URL}/api/scada/reset?stationId=${stationId}`, { method: "POST" });
     return res.ok;
   } catch {
     return false;
@@ -162,7 +162,7 @@ export async function resetScadaStation(stationId: string = "SV-04"): Promise<bo
 
 // ── HR Careers & Talent API ──
 export async function submitJobApplication(payload: JobApplicationPayload): Promise<ApplicationResponse> {
-  const url = typeof window !== "undefined" ? "/api/careers/apply" : `${API_BASE_URL}/api/careers/apply`;
+  const url = typeof window !== "undefined" ? "/api/careers/apply" : `${typeof window !== "undefined" ? "" : API_BASE_URL}/api/careers/apply`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -179,7 +179,7 @@ export async function submitJobApplication(payload: JobApplicationPayload): Prom
 export async function fetchProjects(category?: string) {
   try {
     const query = category && category !== "all" ? `?category=${category}` : "";
-    const res = await fetch(`${API_BASE_URL}/api/projects${query}`, { cache: "no-store" });
+    const res = await fetch(`${typeof window !== "undefined" ? "" : API_BASE_URL}/api/projects${query}`, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -189,7 +189,7 @@ export async function fetchProjects(category?: string) {
 
 export async function fetchProjectBySlug(slug: string) {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/projects/${slug}`, { cache: "no-store" });
+    const res = await fetch(`${typeof window !== "undefined" ? "" : API_BASE_URL}/api/projects/${slug}`, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -199,7 +199,7 @@ export async function fetchProjectBySlug(slug: string) {
 
 export async function fetchServices() {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/services`, { cache: "no-store" });
+    const res = await fetch(`${typeof window !== "undefined" ? "" : API_BASE_URL}/api/services`, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -209,7 +209,7 @@ export async function fetchServices() {
 
 export async function fetchServiceBySlug(slug: string) {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/services/${slug}`, { cache: "no-store" });
+    const res = await fetch(`${typeof window !== "undefined" ? "" : API_BASE_URL}/api/services/${slug}`, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -219,7 +219,7 @@ export async function fetchServiceBySlug(slug: string) {
 
 export async function fetchFleet() {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/fleet`, { cache: "no-store" });
+    const res = await fetch(`${typeof window !== "undefined" ? "" : API_BASE_URL}/api/fleet`, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -229,7 +229,7 @@ export async function fetchFleet() {
 
 export async function fetchCareers() {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/careers`, { cache: "no-store" });
+    const res = await fetch(`${typeof window !== "undefined" ? "" : API_BASE_URL}/api/careers`, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -239,7 +239,7 @@ export async function fetchCareers() {
 
 export async function fetchNews() {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/news`, { cache: "no-store" });
+    const res = await fetch(`${typeof window !== "undefined" ? "" : API_BASE_URL}/api/news`, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -249,7 +249,7 @@ export async function fetchNews() {
 
 export async function fetchNewsById(id: string) {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/news/${id}`, { cache: "no-store" });
+    const res = await fetch(`${typeof window !== "undefined" ? "" : API_BASE_URL}/api/news/${id}`, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -259,7 +259,7 @@ export async function fetchNewsById(id: string) {
 
 export async function fetchStates() {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/states`, { cache: "no-store" });
+    const res = await fetch(`${typeof window !== "undefined" ? "" : API_BASE_URL}/api/states`, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -269,7 +269,7 @@ export async function fetchStates() {
 
 export async function fetchStats() {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/stats`, { cache: "no-store" });
+    const res = await fetch(`${typeof window !== "undefined" ? "" : API_BASE_URL}/api/stats`, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -279,7 +279,7 @@ export async function fetchStats() {
 
 export async function fetchHse() {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/hse`, { cache: "no-store" });
+    const res = await fetch(`${typeof window !== "undefined" ? "" : API_BASE_URL}/api/hse`, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json();
   } catch {
