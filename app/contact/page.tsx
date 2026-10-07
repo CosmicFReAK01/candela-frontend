@@ -32,7 +32,7 @@ export default async function ContactPage() {
 
   try {
     const rows = await query("SELECT * FROM site_settings WHERE id = 'default'");
-    if (rows ) {
+    if (rows && rows.length > 0) {
       settings = {
         ...settings,
         ...rows[0],

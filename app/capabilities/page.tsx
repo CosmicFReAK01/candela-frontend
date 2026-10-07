@@ -19,7 +19,7 @@ export default async function CapabilitiesPage() {
   let fleetList: any[] = [];
   try {
     const rows = await query("SELECT * FROM equipment ORDER BY name ASC;");
-    if (rows ) {
+    if (rows && rows.length > 0) {
       fleetList = rows;
     }
   } catch (err) {

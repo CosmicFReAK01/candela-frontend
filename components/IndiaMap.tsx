@@ -34,7 +34,9 @@ export function IndiaMap({ content }: { content?: any }) {
     });
   }, []);
 
-  const activeState = (states.find((s) => s.id === activeStateId) || states[0]) as typeof states[0] & { subDistricts?: string[] };
+  const activeState = (states.find((s) => s.id === activeStateId) || states[0]) as typeof states[0] & { subDistricts?: string[]; activeSites: string[] };
+
+  if (!activeState) return null;
 
   return (
     <section id="map" className="py-20 lg:py-28 bg-[#F3EFE7] border-b border-[#D9D9D9]">

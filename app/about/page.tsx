@@ -19,17 +19,17 @@ export const metadata: Metadata = {
 export default async function AboutPage() {
   const dbStats = await fetchStats();
   const displayStats = dbStats ? [
-    { value: dbStats.totalKmConstructed || stats[0].value, label: stats[0].label },
-    { value: dbStats.hddCrossingsRecord ? `${dbStats.hddCrossingsRecord}` : stats[1].value, label: stats[1].label },
-    { value: dbStats.safeManHoursMillions || stats[2].value, label: stats[2].label },
-    { value: dbStats.activeSpreads || stats[3].value, label: stats[3].label },
-  ] : stats;
+    { value: dbStats.totalKmConstructed || "3,850+", label: stats[0]?.label || "KM Laid" },
+    { value: dbStats.hddCrossingsRecord ? `${dbStats.hddCrossingsRecord}` : "180+", label: stats[1]?.label || "HDD Crossings" },
+    { value: dbStats.safeManHoursMillions || "28.4M", label: stats[2]?.label || "Safe Man-hours" },
+    { value: dbStats.activeSpreads || "4", label: stats[3]?.label || "Active Spreads" },
+  ] : [];
 
   let aboutContent: any = null;
   let leadershipFromDb: any[] | null = null;
   try {
     const rows = await query("SELECT about_content FROM site_settings WHERE id = 'default'");
-    if (rows  && rows[0].about_content) {
+    if (rows && rows.length > 0 && rows[0].about_content) {
       aboutContent = rows[0].about_content;
     }
     const leaderRows = await query("SELECT * FROM executive_leadership ORDER BY display_order ASC, id ASC;");

@@ -22,6 +22,8 @@ export function FeaturedProjects({ content }: { content?: any }) {
   const featuredList = projectList.slice(0, 3);
   const current = featuredList[selectedIdx] || featuredList[0];
 
+  if (!current) return null;
+
   return (
     <section id="projects" className="py-20 lg:py-28 bg-[#F8F4EC] border-b border-[#D9D9D9]">
       <Container>
