@@ -41,7 +41,7 @@ export function ClientsSection({ content }: { content?: any }) {
         {/* ── Client Logo & Sector Grid ── */}
         <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4">
           {clientList.map((c: any) => {
-            const logoText = c.code || c.logoText || c.name.slice(0, 5).toUpperCase();
+            const logoText = c.code || c.logoText || c.name;
             return (
               <div
                 key={c.id || c.name}

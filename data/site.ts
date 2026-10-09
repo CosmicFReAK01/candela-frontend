@@ -72,9 +72,15 @@ export const stats = [
   { value: "100%", label: "AUT / Radiographic Integrity", sub: "Zero Hydrotest Failure Record" },
 ];
 
-/* ──────────────── Tier-1 Clients ──────────────── */
+/* ──────────────── Tier-1 Clients / National Operators ──────────────── */
 export const clients = [
-  { name: "Indian Oil Corporation (IOCL)", sector: "Refinery & Hydrocarbon Pipelines", logoText: "IOCL" },
+  { id: "c1", code: "ADANI", name: "Adani Total Gas Ltd", sector: "City Gas Distribution Networks", logoText: "ADANI" },
+  { id: "c2", code: "BPCL", name: "Bharat Petroleum (BPCL)", sector: "Cross-Country Product Lines", logoText: "BPCL" },
+  { id: "c3", code: "GAIL", name: "GAIL (India) Limited", sector: "National Gas Transmission", logoText: "GAIL" },
+  { id: "c4", code: "GSPL", name: "Gujarat State Petronet (GSPL)", sector: "State Gas Grid Trunklines", logoText: "GSPL" },
+  { id: "c5", code: "HPCL", name: "Hindustan Petroleum (HPCL)", sector: "Terminal & Distribution Pipelines", logoText: "HPCL" },
+  { id: "c6", code: "IOCL", name: "Indian Oil Corporation (IOCL)", sector: "Refinery & Hydrocarbon Pipelines", logoText: "IOCL" },
+  { id: "c7", code: "ONGC", name: "Oil & Natural Gas Corp (ONGC)", sector: "Upstream & Offshore Tie-Ins", logoText: "ONGC" },
 ];
 
 /* ──────────────── Complete 10 Core Services ──────────────── */

@@ -64,7 +64,7 @@ export default async function ClientsPage() {
           <Container>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {clientList.map((c: any) => {
-                const logoText = c.code || c.logoText || c.name.slice(0, 5).toUpperCase();
+                const logoText = c.code || c.logoText || c.name;
                 return (
                   <div
                     key={c.id || c.name}

@@ -227,7 +227,7 @@ export async function POST(req: Request, { params }: RouteProps) {
       }
 
       case "clients": {
-        const code = body.code || body.name.replace(/[^A-Za-z0-9]/g, "").slice(0, 10).toUpperCase();
+        const rawCode = (body.code && body.code.trim().toUpperCase()) || (body.name ? body.name.replace(/[^A-Za-z0-9]/g, "").slice(0, 10).toUpperCase() : "OP");
         const rows = await query(
           `INSERT INTO clients (code, name, sector, logo_url, is_tier1)
            VALUES ($1, $2, $3, $4, $5)
@@ -237,7 +237,7 @@ export async function POST(req: Request, { params }: RouteProps) {
              logo_url = EXCLUDED.logo_url,
              is_tier1 = EXCLUDED.is_tier1
            RETURNING *;`,
-          [code, body.name, body.sector || "Energy & Hydrocarbon", body.logo_url || "", body.is_tier1 ?? true]
+          [rawCode, body.name?.trim() || "", body.sector?.trim() || "National Gas & Transmission", body.logo_url || "", body.is_tier1 ?? true]
         );
         return NextResponse.json({ success: true, data: rows[0] });
       }
@@ -434,6 +434,12 @@ export async function PUT(req: Request, { params }: RouteProps) {
         const id = body.id;
         if (!id) return NextResponse.json({ error: "Missing client id" }, { status: 400 });
 
+        const name = body.name !== undefined ? (body.name?.trim() || null) : null;
+        const sector = body.sector !== undefined ? (body.sector?.trim() || null) : null;
+        const code = body.code !== undefined ? (body.code?.trim().toUpperCase() || null) : null;
+        const logo_url = body.logo_url !== undefined ? body.logo_url : null;
+        const is_tier1 = body.is_tier1 !== undefined ? body.is_tier1 : null;
+
         const rows = await query(
           `UPDATE clients SET
              name = COALESCE($1, name),
@@ -443,7 +449,7 @@ export async function PUT(req: Request, { params }: RouteProps) {
              is_tier1 = COALESCE($5, is_tier1)
            WHERE id::text = $6 OR code = $6
            RETURNING *;`,
-          [body.name, body.sector, body.code, body.logo_url, body.is_tier1, id]
+          [name, sector, code, logo_url, is_tier1, id]
         );
         return NextResponse.json({ success: true, data: rows[0] });
       }

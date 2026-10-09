@@ -728,7 +728,7 @@ export default function AdminPortal() {
                 { id: "services", label: "EPC Services", icon: Layers, count: services.length },
                 { id: "fleet", label: "Machinery Fleet", icon: Wrench, count: fleet.length },
                 { id: "hse", label: "HSE & Quality Metrics", icon: ShieldCheck, count: null },
-                { id: "clients", label: "Tier-1 Energy Clients", icon: Users, count: clients.length },
+                { id: "clients", label: "National Operators & Clients", icon: Users, count: clients.length },
               ].map((item) => {
                 const Icon = item.icon;
                 const active = activeTab === item.id;
@@ -1846,6 +1846,32 @@ export default function AdminPortal() {
                           </div>
                         </div>
                       </div>
+
+                      {/* Operators Banner Settings */}
+                      <div className="pt-3 border-t border-[#D9D9D9] bg-white p-3 rounded-lg border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="space-y-1 flex-1">
+                          <label className="text-[10px] text-[#787B7E] font-bold uppercase block">
+                            OPERATORS TICKER LABEL (HOMEPAGE)
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="TRUSTED BY NATIONAL OPERATORS:"
+                            value={hero.operatorsLabel || ""}
+                            onChange={(e) => updateHero("operatorsLabel", e.target.value)}
+                            className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded px-2.5 py-1.5 text-xs font-mono font-bold"
+                          />
+                        </div>
+                        <div className="sm:self-end">
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab("clients")}
+                            className="bg-[#242424] hover:bg-[#383838] text-[#C69C6D] px-3 py-2 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 transition whitespace-nowrap"
+                          >
+                            <Users className="w-3.5 h-3.5" />
+                            <span>Manage National Operators ({clients.length})</span>
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   );
                 })()}
@@ -2525,60 +2551,73 @@ export default function AdminPortal() {
           )}
 
           {/* ════════════════════════════════════════════════════════════
-              TAB 10: TIER-1 ENERGY CLIENTS (SECTORS SERVED)
+              TAB 10: NATIONAL OPERATORS & TIER-1 CLIENTS
              ════════════════════════════════════════════════════════════ */}
           {activeTab === "clients" && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-[#D9D9D9]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#D9D9D9]">
                 <div>
-                  <h2 className="font-heading font-extrabold text-2xl text-[#242424]">
-                    Tier-1 Energy Clients & Sectors Served
-                  </h2>
-                  <p className="text-xs text-[#6B6F73] mt-0.5 font-mono">
-                    Manage client credentials and industry domains (e.g. Natural Gas & Transmission, Refinery Hydrocarbons).
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-heading font-extrabold text-2xl text-[#242424]">
+                      National Operators & Tier-1 Clients
+                    </h2>
+                    <span className="text-[10px] font-mono text-[#9E7444] bg-[#F8F4EC] px-2 py-0.5 rounded border border-[#D9D9D9] font-bold">
+                      {clients.length} Active
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#6B6F73] mt-1 font-mono">
+                    Directly controls the homepage <strong>&ldquo;TRUSTED BY NATIONAL OPERATORS&rdquo;</strong> ticker and <code>/clients</code> directory. Add, edit, or delete operators below.
                   </p>
                 </div>
                 <button
                   onClick={() => {
-                    setEditingItem({ is_tier1: true, sector: "Natural Gas & Transmission" });
+                    setEditingItem({ is_tier1: true, sector: "Natural Gas & Transmission", code: "" });
                     setModalType("client");
                   }}
-                  className="bg-[#242424] text-[#C69C6D] hover:bg-[#383838] px-3 py-2 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition"
+                  className="bg-[#242424] text-[#C69C6D] hover:bg-[#383838] px-4 py-2.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition self-start sm:self-auto shadow-sm"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Add Client</span>
+                  <span>Add Operator / Client</span>
                 </button>
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {clients.map((cl) => (
-                  <div key={cl.id} className="p-4 bg-[#F8F4EC] border border-[#D9D9D9] rounded-xl space-y-2 text-xs font-mono">
+                  <div key={cl.id} className="p-4 bg-[#F8F4EC] border border-[#D9D9D9] hover:border-[#C69C6D] rounded-xl space-y-3 text-xs font-mono transition shadow-sm">
                     <div className="flex items-start justify-between">
                       <div>
-                        <div className="text-[10px] text-[#9E7444] font-bold">{cl.code}</div>
-                        <h4 className="font-heading font-bold text-sm text-[#242424]">{cl.name}</h4>
+                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-white border border-[#D9D9D9] rounded text-[10px] font-bold text-[#9E7444]">
+                          <span className="text-[#787B7E]">TICKER:</span>
+                          <span>{cl.code || cl.name}</span>
+                        </div>
+                        <h4 className="font-heading font-bold text-sm text-[#242424] mt-1.5">{cl.name}</h4>
                       </div>
                       <div className="flex items-center gap-1">
                         <button
+                          title="Edit Operator"
                           onClick={() => {
                             setEditingItem(cl);
                             setModalType("client");
                           }}
-                          className="p-1 text-[#4A4D50] hover:text-[#242424] hover:bg-white rounded"
+                          className="p-1.5 text-[#4A4D50] hover:text-[#242424] hover:bg-white rounded transition"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button
+                          title="Delete Operator"
                           onClick={() => setDeleteConfirm({ module: "clients", id: cl.id, title: cl.name })}
-                          className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
+                          className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
-                    <div className="pt-1">
-                      <span className="text-[10px] font-bold bg-white text-[#4A4D50] px-2 py-0.5 rounded border border-[#D9D9D9]">
-                        SECTOR: {cl.sector || "Natural Gas & Transmission"}
+                    <div className="pt-1 border-t border-[#D9D9D9]/60 flex items-center justify-between text-[10px]">
+                      <span className="text-[#6B6F73] font-semibold truncate max-w-[200px]">
+                        {cl.sector || "Natural Gas & Transmission"}
+                      </span>
+                      <span className="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                        LIVE ON SITE
                       </span>
                     </div>
                   </div>
@@ -3666,14 +3705,15 @@ export default function AdminPortal() {
                 </>
               )}
 
-              {/* Client Form Fields */}
+              {/* Operator / Client Form Fields */}
               {modalType === "client" && (
                 <>
                   <div>
-                    <label className="block text-[#4A4D50] mb-1 font-bold">CLIENT NAME *</label>
+                    <label className="block text-[#4A4D50] mb-1 font-bold">OPERATOR / CLIENT FULL NAME *</label>
                     <input
                       required
                       type="text"
+                      placeholder="e.g. GAIL (India) Limited or Bharat Petroleum (BPCL)"
                       value={editingItem?.name || ""}
                       onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
                       className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424]"
@@ -3682,25 +3722,41 @@ export default function AdminPortal() {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[#4A4D50] mb-1 font-bold">CLIENT CODE / SHORTCODE</label>
+                      <label className="block text-[#4A4D50] mb-1 font-bold">TICKER / LOGO CODE *</label>
                       <input
                         type="text"
+                        required
+                        placeholder="e.g. GAIL or ADANI or IOCL"
                         value={editingItem?.code || ""}
                         onChange={(e) => setEditingItem({ ...editingItem, code: e.target.value })}
-                        className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424]"
+                        className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424] font-bold uppercase"
                       />
+                      <span className="text-[10px] text-[#787B7E] mt-1 block">
+                        Displayed in homepage &ldquo;TRUSTED BY NATIONAL OPERATORS&rdquo; banner
+                      </span>
                     </div>
                     <div>
-                      <label className="block text-[#4A4D50] mb-1 font-bold">SECTORS SERVED *</label>
+                      <label className="block text-[#4A4D50] mb-1 font-bold">SECTOR / INDUSTRY SCOPE *</label>
                       <input
                         type="text"
                         required
                         value={editingItem?.sector || ""}
                         onChange={(e) => setEditingItem({ ...editingItem, sector: e.target.value })}
                         className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424]"
-                        placeholder="e.g. Natural Gas & Transmission"
+                        placeholder="e.g. National Gas Transmission"
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[#4A4D50] mb-1 font-bold">LOGO URL (OPTIONAL)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. /logos/gail.png"
+                      value={editingItem?.logo_url || ""}
+                      onChange={(e) => setEditingItem({ ...editingItem, logo_url: e.target.value })}
+                      className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424]"
+                    />
                   </div>
                 </>
               )}

@@ -312,12 +312,12 @@ export function Hero({ content }: { content?: any }) {
         <Container>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="text-xs uppercase font-mono text-[#787B7E] tracking-widest font-semibold">
-              TRUSTED BY NATIONAL OPERATORS:
+              {content?.operatorsLabel || "TRUSTED BY NATIONAL OPERATORS:"}
             </div>
             <div className="flex flex-wrap items-center gap-6 sm:gap-10 text-xs sm:text-sm font-bold text-[#242424]">
               {clientList.map((c: any) => (
                 <span key={c.id || c.name} className="hover:text-[#9E7444] transition-colors cursor-default">
-                  {c.logoText || c.name.slice(0, 5).toUpperCase()}
+                  {c.code || c.logoText || c.name}
                 </span>
               ))}
             </div>
