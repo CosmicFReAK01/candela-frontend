@@ -1575,6 +1575,16 @@ export default function AdminPortal() {
 
                             {/* Direct Photo Upload / Replace button */}
                             <div className="w-full flex flex-col gap-1 text-[10px] font-mono">
+                              {photoSrc ? (
+                                <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-1.5 py-0.5 text-center flex items-center justify-center gap-1">
+                                  <span>✓</span>
+                                  <span>In Database</span>
+                                </span>
+                              ) : (
+                                <span className="text-[9px] text-[#787B7E] bg-[#F8F4EC] rounded px-1.5 py-0.5 text-center">
+                                  Initial Monogram
+                                </span>
+                              )}
                               <label className="cursor-pointer bg-[#F8F4EC] hover:bg-[#EFE9DC] text-[#242424] border border-[#D9D9D9] hover:border-[#C69C6D] rounded-lg px-2 py-1 flex items-center justify-center gap-1 transition text-center font-bold">
                                 <Camera className="w-3 h-3 text-[#9E7444]" />
                                 <span>{photoSrc ? "Replace Photo" : "Upload Photo"}</span>
@@ -3234,105 +3244,160 @@ export default function AdminPortal() {
               }}
               className="space-y-4 text-xs font-mono"
             >
-              {/* ── Photo Management Section ── */}
+              {/* ── Photo Management Section (Direct Database Storage) ── */}
               <div className="p-4 bg-[#F8F4EC] border border-[#D9D9D9] rounded-xl space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-[#242424] font-bold uppercase tracking-wider flex items-center gap-1.5 text-xs">
                     <Camera className="w-3.5 h-3.5 text-[#9E7444]" />
                     <span>Executive Profile Photo</span>
+                    <span className="text-[10px] font-normal text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                      Direct Database Storage
+                    </span>
                   </label>
                   {(directorModal.photo_url || directorModal.image_url) && (
                     <button
                       type="button"
                       onClick={() => setDirectorModal({ ...directorModal, photo_url: "", image_url: "" })}
-                      className="text-red-600 hover:text-red-800 text-[11px] font-bold"
+                      className="text-red-600 hover:text-red-800 text-[11px] font-bold flex items-center gap-1"
                     >
-                      Clear Photo
+                      <Trash2 className="w-3 h-3" />
+                      <span>Remove Photo</span>
                     </button>
                   )}
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center gap-4">
-                  {/* Photo Preview Frame */}
-                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-[#1A1D20] border-2 border-[#C69C6D] shrink-0 shadow-sm flex items-center justify-center">
-                    {directorModal.photo_url || directorModal.image_url ? (
+                {directorModal.photo_url || directorModal.image_url ? (
+                  /* Photo Present State */
+                  <div className="flex flex-col sm:flex-row items-center gap-4 bg-white p-3.5 rounded-xl border border-[#D9D9D9]">
+                    <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-[#1A1D20] border-2 border-[#C69C6D] shrink-0 shadow-sm flex items-center justify-center">
                       <img
                         src={directorModal.photo_url || directorModal.image_url}
                         alt="Profile Preview"
                         className="w-full h-full object-cover object-top"
                       />
-                    ) : (
-                      <div className="text-center p-2 text-[#C69C6D]">
-                        <ImageIcon className="w-8 h-8 mx-auto opacity-40 mb-1" />
-                        <span className="text-[9px] block text-[#D9D9D9]/70">No Photo</span>
-                      </div>
-                    )}
-
-                    {modalUploading && (
-                      <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-white text-[10px] gap-1 p-2 text-center">
-                        <Loader2 className="w-5 h-5 animate-spin text-[#C69C6D]" />
-                        <span>Uploading...</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Upload Controls */}
-                  <div className="flex-1 space-y-2 w-full">
-                    <div>
-                      <label className="cursor-pointer inline-flex items-center justify-center gap-2 bg-[#242424] hover:bg-[#383838] text-[#C69C6D] px-4 py-2 rounded-lg font-bold transition w-full sm:w-auto">
-                        <Upload className="w-3.5 h-3.5" />
-                        <span>{directorModal.photo_url ? "Replace Photo From Device" : "Upload Photo From Device"}</span>
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp,image/avif"
-                          className="hidden"
-                          onChange={async (e) => {
-                            const file = e.target.files?.[0];
-                            if (!file) return;
-                            setModalUploading(true);
-                            try {
-                              const url = await uploadPhotoFile(file);
-                              setDirectorModal({
-                                ...directorModal,
-                                photo_url: url,
-                                image_url: url,
-                              });
-                              showToast("Photo uploaded to secure PostgreSQL media storage!");
-                            } catch (err: any) {
-                              alert("Photo upload error: " + err.message);
-                            } finally {
-                              setModalUploading(false);
-                              e.target.value = "";
-                            }
-                          }}
-                        />
-                      </label>
-                      <span className="text-[10px] text-[#787B7E] block mt-1">
-                        JPG, PNG, WebP or AVIF (up to 10MB). Saved securely in database.
-                      </span>
+                      {modalUploading && (
+                        <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-white text-[10px] gap-1 p-2 text-center">
+                          <Loader2 className="w-5 h-5 animate-spin text-[#C69C6D]" />
+                          <span>Uploading...</span>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Or URL input */}
-                    <div className="pt-1">
-                      <label className="block text-[10px] text-[#6B6F73] font-bold mb-0.5">
-                        OR DIRECT PHOTO URL / CDN LINK
-                      </label>
-                      <input
-                        type="url"
-                        value={directorModal.photo_url || directorModal.image_url || ""}
-                        onChange={(e) =>
+                    <div className="flex-1 space-y-2 w-full text-center sm:text-left">
+                      <div className="flex items-center justify-center sm:justify-start gap-2">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+                          ✓ Photo Saved in Database
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-[#4A4D50] leading-snug">
+                        Stored securely in PostgreSQL (<code className="text-[#9E7444] bg-[#F8F4EC] px-1 py-0.5 rounded">media_assets</code>). No image link or external hosting needed.
+                      </p>
+
+                      <div className="pt-1">
+                        <label className="cursor-pointer inline-flex items-center justify-center gap-2 bg-[#242424] hover:bg-[#383838] text-[#C69C6D] px-3.5 py-1.5 rounded-lg font-bold transition text-xs shadow-xs">
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>Choose New Photo From Device</span>
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,image/avif"
+                            className="hidden"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              setModalUploading(true);
+                              try {
+                                const url = await uploadPhotoFile(file);
+                                setDirectorModal({
+                                  ...directorModal,
+                                  photo_url: url,
+                                  image_url: url,
+                                });
+                                showToast("Photo uploaded and saved to PostgreSQL database!");
+                              } catch (err: any) {
+                                alert("Photo upload error: " + err.message);
+                              } finally {
+                                setModalUploading(false);
+                                e.target.value = "";
+                              }
+                            }}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* No Photo State - Interactive Drag & Drop / Click Upload Box */
+                  <label
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={async (e) => {
+                      e.preventDefault();
+                      const file = e.dataTransfer.files?.[0];
+                      if (!file) return;
+                      setModalUploading(true);
+                      try {
+                        const url = await uploadPhotoFile(file);
+                        setDirectorModal({
+                          ...directorModal,
+                          photo_url: url,
+                          image_url: url,
+                        });
+                        showToast("Photo uploaded and saved to PostgreSQL database!");
+                      } catch (err: any) {
+                        alert("Photo upload error: " + err.message);
+                      } finally {
+                        setModalUploading(false);
+                      }
+                    }}
+                    className="cursor-pointer border-2 border-dashed border-[#C69C6D]/70 hover:border-[#9E7444] bg-white hover:bg-[#FDFBF7] rounded-xl p-5 flex flex-col items-center justify-center text-center transition group block"
+                  >
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/avif"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setModalUploading(true);
+                        try {
+                          const url = await uploadPhotoFile(file);
                           setDirectorModal({
                             ...directorModal,
-                            photo_url: e.target.value,
-                            image_url: e.target.value,
-                          })
+                            photo_url: url,
+                            image_url: url,
+                          });
+                          showToast("Photo uploaded and saved to PostgreSQL database!");
+                        } catch (err: any) {
+                          alert("Photo upload error: " + err.message);
+                        } finally {
+                          setModalUploading(false);
+                          e.target.value = "";
                         }
-                        className="w-full bg-white border border-[#D9D9D9] rounded-lg px-2.5 py-1.5 text-xs text-[#242424]"
-                        placeholder="https://... or /api/media/..."
-                      />
-                    </div>
-                  </div>
-                </div>
+                      }}
+                    />
+
+                    {modalUploading ? (
+                      <div className="py-2 flex flex-col items-center gap-2">
+                        <Loader2 className="w-8 h-8 animate-spin text-[#C69C6D]" />
+                        <span className="text-xs font-bold text-[#242424]">Saving to PostgreSQL database...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="w-12 h-12 rounded-full bg-[#F8F4EC] group-hover:bg-[#EFE9DC] text-[#C69C6D] group-hover:text-[#9E7444] flex items-center justify-center mb-2 transition shadow-xs">
+                          <Upload className="w-5 h-5" />
+                        </div>
+                        <span className="text-xs font-bold text-[#242424] group-hover:text-[#9E7444] transition">
+                          Click to Browse or Drag & Drop Photo Here
+                        </span>
+                        <span className="text-[11px] text-[#787B7E] mt-1 max-w-sm block">
+                          Uploads directly to your database. <strong className="text-[#242424]">No image link or URL required.</strong>
+                        </span>
+                        <span className="text-[10px] text-[#9E7444] font-bold mt-2 bg-[#F8F4EC] px-2 py-0.5 rounded-full border border-[#D9D9D9]">
+                          Supports JPG, PNG, WebP, AVIF up to 10MB
+                        </span>
+                      </>
+                    )}
+                  </label>
+                )}
               </div>
 
               {/* ── Name & Role ── */}
