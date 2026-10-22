@@ -89,6 +89,37 @@ export async function PUT(req: Request) {
       regional_bases ? JSON.stringify(regional_bases) : null,
     ]);
 
+    // Automatically sync executive_leadership table if leadership array is updated
+    if (about_content && Array.isArray(about_content.leadership)) {
+      try {
+        await query("DELETE FROM executive_leadership;");
+        for (let i = 0; i < about_content.leadership.length; i++) {
+          const m = about_content.leadership[i];
+          const img = m.photo_url || m.image_url || "";
+          await query(
+            `INSERT INTO executive_leadership (id, name, role, designation, experience, committee, qualifications, background, email, linkedin, image_url, display_order, created_at, updated_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW(), NOW());`,
+            [
+              i + 1,
+              m.name || "",
+              m.role || "",
+              m.designation || m.role || "",
+              m.experience || "",
+              m.committee || "",
+              m.qualifications || "",
+              m.background || "",
+              m.email || "",
+              m.linkedin || "",
+              img,
+              i + 1,
+            ]
+          );
+        }
+      } catch (syncErr) {
+        console.error("[Settings API] Warning: Failed to sync executive_leadership table:", syncErr);
+      }
+    }
+
     const { admin_passkey, ...safeUpdated } = rows[0] || {};
     return NextResponse.json({ success: true, data: safeUpdated });
   } catch (err: any) {

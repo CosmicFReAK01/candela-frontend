@@ -59,10 +59,10 @@ export function Navbar() {
               </span>
               <span className="font-mono text-[11px] font-bold tracking-wide text-red-800">24x7 CONTROL ROOM:</span>
               <a
-                href={`tel:${settings.control_room_hotline.replace(/[^0-9+]/g, "")}`}
+                href={`tel:${settings.control_room_hotline?.replace(/[^0-9+]/g, "") || "18001809999"}`}
                 className="hover:underline text-red-950 font-mono font-bold tracking-wider"
               >
-                {settings.control_room_hotline}
+                {settings.control_room_hotline || "1800-180-9999"}
               </a>
             </div>
 
