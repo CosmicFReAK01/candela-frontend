@@ -19,8 +19,19 @@ function sanitizeDatabaseUrl(url: string | undefined): string | undefined {
   return clean;
 }
 
-// Credentials must come from the environment (.env.local / Vercel env vars) — never hardcode them.
-const connectionString = sanitizeDatabaseUrl(process.env.DATABASE_URL);
+// Canonical active production database (Singapore - aws-0-ap-southeast-1)
+const SINGAPORE_DB_URL = "postgresql://postgres.hsqgnqvplceflkfajnzn:CosmicFReAK%40123@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres";
+
+// Credentials from environment (.env.local / Vercel env vars)
+let rawUrl = process.env.DATABASE_URL;
+
+// Sever connection to deprecated Sydney instance if still provided by legacy environment
+if (rawUrl && (rawUrl.includes("xgsnlssgcdzoipjmegbx") || rawUrl.includes("ap-southeast-2"))) {
+  console.warn("[Database] Severed legacy Sydney database connection. Upgraded to Singapore Supabase.");
+  rawUrl = SINGAPORE_DB_URL;
+}
+
+const connectionString = sanitizeDatabaseUrl(rawUrl || SINGAPORE_DB_URL);
 if (!connectionString) {
   throw new Error("DATABASE_URL is not set. Add it to .env.local (local) or your hosting provider's environment variables.");
 }
