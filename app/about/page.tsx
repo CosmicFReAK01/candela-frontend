@@ -7,7 +7,7 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { leadershipTeam as fallbackLeadership, whyChooseUsPillars as fallbackWhyChooseUs, stats } from "@/data/site";
 import { fetchStats } from "@/lib/api";
 import { query } from "@/lib/db";
-import { Award, ArrowRight, CheckCircle2, ChevronRight, ShieldCheck } from "lucide-react";
+import { Award, ArrowRight, CheckCircle2, ChevronRight, ShieldCheck, Mail, Linkedin, UserCheck } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -322,33 +322,125 @@ export default async function AboutPage() {
                 </span>
               </div>
 
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                {leadershipList.map((leader: any) => (
-                  <div
-                    key={leader.name}
-                    className="bg-white border border-[#D9D9D9] rounded-xl p-6 flex flex-col justify-between hover:border-[#C69C6D] transition group shadow-sm hover:shadow-md"
-                  >
-                    <div>
-                      <div className="w-12 h-12 rounded-full bg-[#F8F4EC] border border-[#D9D9D9] flex items-center justify-center font-heading font-bold text-[#9E7444] text-lg group-hover:bg-[#C69C6D] group-hover:text-white transition-colors">
-                        {leader.name.split(" ")[0]?.[0] || ""}{leader.name.split(" ")[1]?.[0] || ""}
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {leadershipList.map((leader: any, idx: number) => {
+                  const photoSrc = leader.photo_url || leader.image_url;
+                  const initials = `${leader.name?.split(" ")[0]?.[0] || ""}${leader.name?.split(" ")[1]?.[0] || ""}`.toUpperCase();
+
+                  return (
+                    <div
+                      key={leader.id || leader.name || idx}
+                      className="bg-white border border-[#D9D9D9] hover:border-[#C69C6D] rounded-2xl flex flex-col justify-between transition-all duration-300 group shadow-xs hover:shadow-xl overflow-hidden hover:-translate-y-1"
+                    >
+                      {/* Top: Portrait Photo Frame */}
+                      <div className="relative aspect-[4/4.2] w-full bg-[#1A1D20] overflow-hidden border-b border-[#E8E4D9]">
+                        {photoSrc ? (
+                          <img
+                            src={photoSrc}
+                            alt={`${leader.name} - ${leader.role || "Governing Council Member"}`}
+                            loading="lazy"
+                            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#242424] to-[#141517] p-6 text-center">
+                            <div className="w-20 h-20 rounded-2xl bg-[#C69C6D]/20 border border-[#C69C6D]/40 flex items-center justify-center font-heading font-bold text-[#C69C6D] text-2xl mb-3 shadow-inner">
+                              {initials}
+                            </div>
+                            <span className="text-[11px] font-mono text-[#D9D9D9]/70 tracking-wider uppercase">
+                              Executive Member
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Gradient Vignette Overlay at bottom of photo */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+
+                        {/* Experience Badge (floating top-right) */}
+                        {leader.experience && (
+                          <div className="absolute top-3 right-3 bg-[#1A1D20]/90 backdrop-blur-md border border-[#C69C6D]/50 text-[#C69C6D] text-[10px] font-mono font-bold px-2.5 py-1 rounded-full shadow-md">
+                            {leader.experience}
+                          </div>
+                        )}
+
+                        {/* Council Badge (floating bottom-left) */}
+                        <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-[#242424]/85 backdrop-blur-md border border-white/10 px-2 py-0.5 rounded text-[10px] font-mono text-white/90">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#C69C6D] animate-pulse" />
+                          <span>COUNCIL MEMBER</span>
+                        </div>
                       </div>
 
-                      <h3 className="font-heading font-bold text-lg text-[#242424] mt-4 leading-snug">
-                        {leader.name}
-                      </h3>
-                      <div className="text-xs font-mono text-[#9E7444] font-bold mt-0.5">
-                        {leader.role}
-                      </div>
-                      <div className="text-[11px] font-mono text-[#6B6F73] mt-1">
-                        {leader.experience}
-                      </div>
+                      {/* Bottom: Member Details & Credentials */}
+                      <div className="p-5 sm:p-6 flex flex-col justify-between flex-1">
+                        <div>
+                          {/* Name */}
+                          <h3 className="font-heading font-bold text-lg sm:text-xl text-[#242424] leading-snug group-hover:text-[#9E7444] transition-colors">
+                            {leader.name}
+                          </h3>
 
-                      <p className="text-xs text-[#4A4D50] mt-3 leading-relaxed">
-                        {leader.background}
-                      </p>
+                          {/* Role / Executive Title */}
+                          <div className="text-xs font-mono font-bold text-[#9E7444] mt-1 tracking-tight">
+                            {leader.role}
+                          </div>
+
+                          {/* Official Designation (if different from role) */}
+                          {leader.designation && leader.designation !== leader.role && (
+                            <div className="text-[11px] font-mono text-[#6B6F73] mt-0.5">
+                              {leader.designation}
+                            </div>
+                          )}
+
+                          {/* Committee / Council Assignment */}
+                          {leader.committee && (
+                            <div className="mt-2.5 inline-block text-[10px] font-mono text-[#4A4D50] bg-[#F8F4EC] border border-[#E5DECF] px-2 py-0.5 rounded">
+                              {leader.committee}
+                            </div>
+                          )}
+
+                          {/* Qualifications */}
+                          {leader.qualifications && (
+                            <div className="text-[10px] font-mono text-[#787B7E] mt-1.5">
+                              {leader.qualifications}
+                            </div>
+                          )}
+
+                          {/* Professional Background */}
+                          <p className="text-xs text-[#4A4D50] mt-3 leading-relaxed font-sans line-clamp-4 group-hover:line-clamp-none transition-all duration-300">
+                            {leader.background}
+                          </p>
+                        </div>
+
+                        {/* Footer: Social/Contact Links */}
+                        {(leader.email || leader.linkedin) && (
+                          <div className="mt-4 pt-3 border-t border-[#F0ECE1] flex items-center justify-between text-xs font-mono text-[#6B6F73]">
+                            <span className="text-[10px] text-[#787B7E] uppercase">Official Contact</span>
+                            <div className="flex items-center gap-2">
+                              {leader.linkedin && (
+                                <a
+                                  href={leader.linkedin}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  aria-label={`${leader.name} on LinkedIn`}
+                                  className="w-7 h-7 rounded-lg bg-[#F8F4EC] border border-[#D9D9D9] flex items-center justify-center text-[#4A4D50] hover:text-[#0A66C2] hover:border-[#0A66C2] transition-colors"
+                                >
+                                  <Linkedin className="w-3.5 h-3.5" />
+                                </a>
+                              )}
+                              {leader.email && (
+                                <a
+                                  href={`mailto:${leader.email}`}
+                                  aria-label={`Email ${leader.name}`}
+                                  className="w-7 h-7 rounded-lg bg-[#F8F4EC] border border-[#D9D9D9] flex items-center justify-center text-[#4A4D50] hover:text-[#C69C6D] hover:border-[#C69C6D] transition-colors"
+                                >
+                                  <Mail className="w-3.5 h-3.5" />
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </Container>

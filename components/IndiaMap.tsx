@@ -249,7 +249,7 @@ export function IndiaMap({ content }: { content?: any }) {
                 </div>
 
                 {/* Sub-Districts Covered */}
-                {activeState.subDistricts && (
+                {Array.isArray(activeState.subDistricts) && activeState.subDistricts.length > 0 && (
                   <div>
                     <div className="text-xs font-mono text-[#6B6F73] uppercase tracking-wider mb-2 font-semibold flex items-center gap-1.5">
                       <Layers className="w-3.5 h-3.5 text-[#9E7444]" />

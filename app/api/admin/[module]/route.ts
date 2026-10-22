@@ -245,10 +245,22 @@ export async function POST(req: Request, { params }: RouteProps) {
       case "leadership":
       case "executive_leadership": {
         const rows = await query(
-          `INSERT INTO executive_leadership (name, role, background, experience, display_order)
-           VALUES ($1, $2, $3, $4, $5)
+          `INSERT INTO executive_leadership (name, role, designation, committee, qualifications, background, experience, email, linkedin, image_url, display_order)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
            RETURNING *;`,
-          [body.name, body.role, body.background, body.experience || "", body.display_order || 0]
+          [
+            body.name,
+            body.role,
+            body.designation || body.role,
+            body.committee || "",
+            body.qualifications || "",
+            body.background,
+            body.experience || "",
+            body.email || "",
+            body.linkedin || "",
+            body.image_url || body.photo_url || "",
+            body.display_order || 0,
+          ]
         );
         return NextResponse.json({ success: true, data: rows[0] });
       }
@@ -507,12 +519,31 @@ export async function PUT(req: Request, { params }: RouteProps) {
           `UPDATE executive_leadership SET
              name = COALESCE($1, name),
              role = COALESCE($2, role),
-             background = COALESCE($3, background),
-             experience = COALESCE($4, experience),
-             display_order = COALESCE($5, display_order),
+             designation = COALESCE($3, designation),
+             committee = COALESCE($4, committee),
+             qualifications = COALESCE($5, qualifications),
+             background = COALESCE($6, background),
+             experience = COALESCE($7, experience),
+             email = COALESCE($8, email),
+             linkedin = COALESCE($9, linkedin),
+             image_url = COALESCE($10, image_url),
+             display_order = COALESCE($11, display_order),
              updated_at = NOW()
-           WHERE id::text = $6::text RETURNING *;`,
-          [body.name, body.role, body.background, body.experience, body.display_order, id]
+           WHERE id::text = $12::text RETURNING *;`,
+          [
+            body.name,
+            body.role,
+            body.designation,
+            body.committee,
+            body.qualifications,
+            body.background,
+            body.experience,
+            body.email,
+            body.linkedin,
+            body.image_url || body.photo_url,
+            body.display_order,
+            id,
+          ]
         );
         return NextResponse.json({ success: true, data: rows[0] });
       }

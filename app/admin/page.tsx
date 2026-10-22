@@ -33,6 +33,14 @@ import {
   Sparkles,
   MessageSquare,
   KeyRound,
+  Upload,
+  Camera,
+  ArrowUp,
+  ArrowDown,
+  Image as ImageIcon,
+  Mail,
+  Linkedin,
+  Loader2,
 } from "lucide-react";
 
 export default function AdminPortal() {
@@ -88,6 +96,23 @@ export default function AdminPortal() {
   const [regionalBaseModal, setRegionalBaseModal] = useState<any | null>(null);
   const [pillarModal, setPillarModal] = useState<any | null>(null);
   const [viewNotesModal, setViewNotesModal] = useState<{ type: "rfq" | "application"; item: any } | null>(null);
+  const [uploadingLeaderIdx, setUploadingLeaderIdx] = useState<number | null>(null);
+  const [modalUploading, setModalUploading] = useState<boolean>(false);
+
+  const uploadPhotoFile = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `Upload failed with HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    return data.url;
+  };
 
   // Security / Password & Master Recovery Modals
   const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
@@ -1227,7 +1252,20 @@ export default function AdminPortal() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => setDirectorModal({ name: "", role: "", experience: "", background: "" })}
+                    onClick={() =>
+                      setDirectorModal({
+                        name: "",
+                        role: "",
+                        designation: "",
+                        committee: "",
+                        experience: "",
+                        qualifications: "",
+                        background: "",
+                        email: "",
+                        linkedin: "",
+                        photo_url: "",
+                      })
+                    }
                     className="bg-[#242424] text-[#C69C6D] hover:bg-[#383838] px-4 py-2 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition self-start"
                   >
                     <Plus className="w-4 h-4" />
@@ -1376,66 +1414,282 @@ export default function AdminPortal() {
                 </div>
 
                 {/* Directors Heading */}
-                <div className="pt-4 border-t border-[#D9D9D9] flex items-center justify-between">
+                <div className="pt-4 border-t border-[#D9D9D9] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <span className="text-[10px] font-mono font-bold text-[#9E7444] uppercase tracking-wider block">
-                      GOVERNING COUNCIL MEMBERS
+                      GOVERNING COUNCIL MEMBERS & LEADERSHIP
                     </span>
                     <h4 className="font-heading font-bold text-base text-[#242424]">
-                      Board of Directors & Leadership Team ({(settings.about_content?.leadership || []).length})
+                      Board of Directors & Leadership Team ({(settings.about_content?.leadership || []).length} Members)
                     </h4>
+                    <p className="text-[11px] text-[#6B6F73] font-sans mt-0.5">
+                      Upload, replace, and reorder executive member photos and details. Changes are persisted securely in PostgreSQL and live on the public site immediately.
+                    </p>
                   </div>
                   <button
                     type="button"
-                    onClick={() => setDirectorModal({ name: "", role: "", experience: "", background: "" })}
-                    className="bg-[#242424] text-[#C69C6D] hover:bg-[#383838] px-3 py-1.5 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 transition"
+                    onClick={() =>
+                      setDirectorModal({
+                        name: "",
+                        role: "",
+                        designation: "",
+                        committee: "",
+                        experience: "",
+                        qualifications: "",
+                        background: "",
+                        email: "",
+                        linkedin: "",
+                        photo_url: "",
+                      })
+                    }
+                    className="bg-[#242424] text-[#C69C6D] hover:bg-[#383838] px-3.5 py-2 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition shadow-xs self-start sm:self-auto shrink-0"
                   >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Add Director</span>
+                    <Plus className="w-4 h-4" />
+                    <span>Add Council Member</span>
                   </button>
                 </div>
 
-                {/* Directors Grid */}
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {(settings.about_content?.leadership || []).map((leader: any, idx: number) => (
-                    <div
-                      key={idx}
-                      className="bg-white border border-[#D9D9D9] hover:border-[#C69C6D] rounded-xl p-5 space-y-3 shadow-xs transition"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <h4 className="font-heading font-bold text-base text-[#242424]">{leader.name}</h4>
-                          <div className="text-xs font-mono text-[#9E7444] font-bold">{leader.role}</div>
-                          <div className="text-[10px] font-mono text-[#6B6F73]">{leader.experience}</div>
+                {/* Directors Management Grid */}
+                <div className="grid gap-4 md:grid-cols-2">
+                  {(settings.about_content?.leadership || []).map((leader: any, idx: number) => {
+                    const photoSrc = leader.photo_url || leader.image_url;
+                    const initials = `${leader.name?.split(" ")[0]?.[0] || ""}${leader.name?.split(" ")[1]?.[0] || ""}`.toUpperCase();
+                    const isUploading = uploadingLeaderIdx === idx;
+                    const totalMembers = (settings.about_content?.leadership || []).length;
+
+                    return (
+                      <div
+                        key={leader.id || idx}
+                        className="bg-white border border-[#D9D9D9] hover:border-[#C69C6D] rounded-2xl p-4 sm:p-5 flex flex-col justify-between transition-all shadow-xs space-y-4"
+                      >
+                        {/* Card Top Actions: Order badge, Reorder arrows, Edit & Delete */}
+                        <div className="flex items-center justify-between pb-3 border-b border-[#F0ECE1] gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="w-6 h-6 rounded-md bg-[#242424] text-[#C69C6D] font-mono font-bold text-[11px] flex items-center justify-center shadow-xs">
+                              #{idx + 1}
+                            </span>
+                            <span className="text-[10px] font-mono text-[#787B7E] uppercase font-bold hidden sm:inline">
+                              Display Rank
+                            </span>
+                            {/* Reorder Buttons */}
+                            <div className="flex items-center gap-0.5 ml-1 bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-0.5">
+                              <button
+                                type="button"
+                                title="Move Earlier in Order"
+                                disabled={idx === 0}
+                                onClick={() => {
+                                  if (idx === 0) return;
+                                  const cur = [...(settings.about_content?.leadership || [])];
+                                  const [moved] = cur.splice(idx, 1);
+                                  cur.splice(idx - 1, 0, moved);
+                                  const updated = {
+                                    ...settings,
+                                    about_content: { ...settings.about_content, leadership: cur },
+                                  };
+                                  setSettings(updated);
+                                  handleSaveSettings(updated);
+                                }}
+                                className="p-1 rounded text-[#4A4D50] hover:text-[#242424] hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed transition"
+                              >
+                                <ArrowUp className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                title="Move Later in Order"
+                                disabled={idx === totalMembers - 1}
+                                onClick={() => {
+                                  if (idx === totalMembers - 1) return;
+                                  const cur = [...(settings.about_content?.leadership || [])];
+                                  const [moved] = cur.splice(idx, 1);
+                                  cur.splice(idx + 1, 0, moved);
+                                  const updated = {
+                                    ...settings,
+                                    about_content: { ...settings.about_content, leadership: cur },
+                                  };
+                                  setSettings(updated);
+                                  handleSaveSettings(updated);
+                                }}
+                                className="p-1 rounded text-[#4A4D50] hover:text-[#242424] hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed transition"
+                              >
+                                <ArrowDown className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Edit & Delete Action Buttons */}
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setDirectorModal({ ...leader, index: idx })}
+                              className="px-2.5 py-1 text-xs font-mono font-bold text-[#242424] bg-[#F8F4EC] hover:bg-[#EFE9DC] border border-[#D9D9D9] hover:border-[#C69C6D] rounded-lg flex items-center gap-1 transition"
+                            >
+                              <Edit2 className="w-3 h-3" />
+                              <span>Edit</span>
+                            </button>
+                            <button
+                              type="button"
+                              title="Delete Member"
+                              onClick={() => {
+                                if (confirm(`Are you sure you want to remove ${leader.name} from the Governing Council?`)) {
+                                  const nextLeaders = settings.about_content.leadership.filter((_: any, i: number) => i !== idx);
+                                  const updated = {
+                                    ...settings,
+                                    about_content: { ...settings.about_content, leadership: nextLeaders },
+                                  };
+                                  setSettings(updated);
+                                  handleSaveSettings(updated);
+                                }
+                              }}
+                              className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 border border-transparent hover:border-red-200 rounded-lg transition"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => setDirectorModal({ ...leader, index: idx })}
-                            className="p-1.5 text-[#4A4D50] hover:text-[#242424] hover:bg-[#F8F4EC] rounded transition"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              const nextLeaders = settings.about_content.leadership.filter((_: any, i: number) => i !== idx);
-                              const updated = {
-                                ...settings,
-                                about_content: { ...settings.about_content, leadership: nextLeaders },
-                              };
-                              setSettings(updated);
-                              handleSaveSettings(updated);
-                            }}
-                            className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+
+                        {/* Card Body: Photo & Member Details */}
+                        <div className="flex flex-col sm:flex-row items-start gap-4">
+                          {/* Photo Thumbnail + Quick Controls */}
+                          <div className="flex flex-col items-center gap-2 shrink-0 w-full sm:w-28">
+                            <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-[#1A1D20] border-2 border-[#D9D9D9] group-hover:border-[#C69C6D] shadow-sm">
+                              {photoSrc ? (
+                                <img
+                                  src={photoSrc}
+                                  alt={leader.name}
+                                  className="w-full h-full object-cover object-top"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex flex-col items-center justify-center bg-[#242424] text-[#C69C6D] font-heading font-bold text-xl">
+                                  <span>{initials}</span>
+                                  <span className="text-[8px] font-mono text-[#D9D9D9]/60 mt-1 uppercase">No Photo</span>
+                                </div>
+                              )}
+
+                              {isUploading && (
+                                <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center text-white text-[10px] font-mono gap-1">
+                                  <Loader2 className="w-4 h-4 animate-spin text-[#C69C6D]" />
+                                  <span>Uploading...</span>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Direct Photo Upload / Replace button */}
+                            <div className="w-full flex flex-col gap-1 text-[10px] font-mono">
+                              <label className="cursor-pointer bg-[#F8F4EC] hover:bg-[#EFE9DC] text-[#242424] border border-[#D9D9D9] hover:border-[#C69C6D] rounded-lg px-2 py-1 flex items-center justify-center gap-1 transition text-center font-bold">
+                                <Camera className="w-3 h-3 text-[#9E7444]" />
+                                <span>{photoSrc ? "Replace Photo" : "Upload Photo"}</span>
+                                <input
+                                  type="file"
+                                  accept="image/jpeg,image/png,image/webp,image/avif"
+                                  className="hidden"
+                                  onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    setUploadingLeaderIdx(idx);
+                                    try {
+                                      const url = await uploadPhotoFile(file);
+                                      const cur = [...(settings.about_content?.leadership || [])];
+                                      cur[idx] = { ...cur[idx], photo_url: url, image_url: url };
+                                      const updated = {
+                                        ...settings,
+                                        about_content: { ...settings.about_content, leadership: cur },
+                                      };
+                                      setSettings(updated);
+                                      await handleSaveSettings(updated);
+                                      showToast(`Photo for ${leader.name} successfully updated!`);
+                                    } catch (err: any) {
+                                      alert("Upload error: " + err.message);
+                                    } finally {
+                                      setUploadingLeaderIdx(null);
+                                      e.target.value = "";
+                                    }
+                                  }}
+                                />
+                              </label>
+
+                              {photoSrc && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (confirm(`Remove photo for ${leader.name}? It will fall back to monogram initials.`)) {
+                                      const cur = [...(settings.about_content?.leadership || [])];
+                                      cur[idx] = { ...cur[idx], photo_url: "", image_url: "" };
+                                      const updated = {
+                                        ...settings,
+                                        about_content: { ...settings.about_content, leadership: cur },
+                                      };
+                                      setSettings(updated);
+                                      handleSaveSettings(updated);
+                                      showToast(`Photo cleared for ${leader.name}`);
+                                    }
+                                  }}
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded px-1.5 py-0.5 text-center transition"
+                                >
+                                  Remove Photo
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Member Text Info */}
+                          <div className="flex-1 space-y-1.5 w-full">
+                            <h4 className="font-heading font-bold text-base text-[#242424] leading-snug">
+                              {leader.name}
+                            </h4>
+                            <div className="text-xs font-mono text-[#9E7444] font-bold">
+                              {leader.role}
+                            </div>
+                            {leader.designation && leader.designation !== leader.role && (
+                              <div className="text-[11px] font-mono text-[#4A4D50]">
+                                {leader.designation}
+                              </div>
+                            )}
+
+                            <div className="flex flex-wrap gap-1.5 pt-1">
+                              {leader.experience && (
+                                <span className="text-[10px] font-mono bg-[#F8F4EC] border border-[#E5DECF] text-[#242424] px-2 py-0.5 rounded-full font-bold">
+                                  {leader.experience}
+                                </span>
+                              )}
+                              {leader.committee && (
+                                <span className="text-[10px] font-mono bg-amber-50 border border-amber-200 text-amber-900 px-2 py-0.5 rounded-full">
+                                  {leader.committee}
+                                </span>
+                              )}
+                            </div>
+
+                            {leader.qualifications && (
+                              <div className="text-[10px] font-mono text-[#787B7E]">
+                                🎓 {leader.qualifications}
+                              </div>
+                            )}
+
+                            <p className="text-xs text-[#4A4D50] leading-relaxed line-clamp-3 font-sans pt-1">
+                              {leader.background}
+                            </p>
+
+                            {(leader.email || leader.linkedin) && (
+                              <div className="pt-2 flex items-center gap-3 text-[10px] font-mono text-[#6B6F73]">
+                                {leader.email && (
+                                  <span className="truncate max-w-[180px]">✉️ {leader.email}</span>
+                                )}
+                                {leader.linkedin && (
+                                  <a
+                                    href={leader.linkedin}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-[#0A66C2] hover:underline"
+                                  >
+                                    LinkedIn ↗
+                                  </a>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                      <p className="text-xs text-[#4A4D50] leading-relaxed line-clamp-3 font-sans">
-                        {leader.background}
-                      </p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -2922,32 +3176,53 @@ export default function AdminPortal() {
          ══════════════════════════════════════════════════════════════════ */}
       {directorModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-          <div className="bg-white border border-[#D9D9D9] rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative space-y-4">
-            <button onClick={() => setDirectorModal(null)} className="absolute top-4 right-4 p-2 text-[#6B6F73] hover:text-[#242424] rounded-lg bg-[#F8F4EC]">
+          <div className="bg-white border border-[#D9D9D9] rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative space-y-5 my-8 max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setDirectorModal(null)}
+              className="absolute top-4 right-4 p-2 text-[#6B6F73] hover:text-[#242424] rounded-lg bg-[#F8F4EC] transition"
+            >
               <X className="w-4 h-4" />
             </button>
-            <h3 className="font-heading font-bold text-xl text-[#242424]">
-              {directorModal.index !== undefined ? "Edit Director Profile" : "Add Executive Director"}
-            </h3>
+
+            <div>
+              <span className="text-[10px] font-mono font-bold text-[#9E7444] uppercase tracking-wider block">
+                GOVERNING COUNCIL PROFILE
+              </span>
+              <h3 className="font-heading font-bold text-xl text-[#242424]">
+                {directorModal.index !== undefined ? "Edit Council Member Profile" : "Add Governing Council Member"}
+              </h3>
+              <p className="text-xs text-[#6B6F73] font-sans mt-0.5">
+                Manage executive photography, designations, committee appointments, and credentials. Saved directly to the database.
+              </p>
+            </div>
+
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 const cur = [...(settings.about_content?.leadership || [])];
+                const photoValue = directorModal.photo_url || directorModal.image_url || "";
+                const newMemberData = {
+                  id: directorModal.id || `lead_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+                  name: directorModal.name,
+                  role: directorModal.role,
+                  designation: directorModal.designation || directorModal.role,
+                  committee: directorModal.committee || "",
+                  qualifications: directorModal.qualifications || "",
+                  experience: directorModal.experience || "",
+                  background: directorModal.background,
+                  email: directorModal.email || "",
+                  linkedin: directorModal.linkedin || "",
+                  photo_url: photoValue,
+                  image_url: photoValue,
+                  display_order: directorModal.index !== undefined ? directorModal.index + 1 : cur.length + 1,
+                };
+
                 if (directorModal.index !== undefined) {
-                  cur[directorModal.index] = {
-                    name: directorModal.name,
-                    role: directorModal.role,
-                    experience: directorModal.experience,
-                    background: directorModal.background,
-                  };
+                  cur[directorModal.index] = newMemberData;
                 } else {
-                  cur.push({
-                    name: directorModal.name,
-                    role: directorModal.role,
-                    experience: directorModal.experience,
-                    background: directorModal.background,
-                  });
+                  cur.push(newMemberData);
                 }
+
                 const updated = {
                   ...settings,
                   about_content: { ...settings.about_content, leadership: cur },
@@ -2955,57 +3230,238 @@ export default function AdminPortal() {
                 setSettings(updated);
                 handleSaveSettings(updated);
                 setDirectorModal(null);
+                showToast(`Saved ${directorModal.name}'s profile to PostgreSQL database!`);
               }}
-              className="space-y-3 text-xs font-mono"
+              className="space-y-4 text-xs font-mono"
             >
-              <div>
-                <label className="block text-[#4A4D50] mb-1 font-bold">FULL NAME *</label>
-                <input
-                  required
-                  type="text"
-                  value={directorModal.name || ""}
-                  onChange={(e) => setDirectorModal({ ...directorModal, name: e.target.value })}
-                  className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424]"
-                  placeholder="e.g. Rajendra V. Mehta"
-                />
+              {/* ── Photo Management Section ── */}
+              <div className="p-4 bg-[#F8F4EC] border border-[#D9D9D9] rounded-xl space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-[#242424] font-bold uppercase tracking-wider flex items-center gap-1.5 text-xs">
+                    <Camera className="w-3.5 h-3.5 text-[#9E7444]" />
+                    <span>Executive Profile Photo</span>
+                  </label>
+                  {(directorModal.photo_url || directorModal.image_url) && (
+                    <button
+                      type="button"
+                      onClick={() => setDirectorModal({ ...directorModal, photo_url: "", image_url: "" })}
+                      className="text-red-600 hover:text-red-800 text-[11px] font-bold"
+                    >
+                      Clear Photo
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  {/* Photo Preview Frame */}
+                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-[#1A1D20] border-2 border-[#C69C6D] shrink-0 shadow-sm flex items-center justify-center">
+                    {directorModal.photo_url || directorModal.image_url ? (
+                      <img
+                        src={directorModal.photo_url || directorModal.image_url}
+                        alt="Profile Preview"
+                        className="w-full h-full object-cover object-top"
+                      />
+                    ) : (
+                      <div className="text-center p-2 text-[#C69C6D]">
+                        <ImageIcon className="w-8 h-8 mx-auto opacity-40 mb-1" />
+                        <span className="text-[9px] block text-[#D9D9D9]/70">No Photo</span>
+                      </div>
+                    )}
+
+                    {modalUploading && (
+                      <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-white text-[10px] gap-1 p-2 text-center">
+                        <Loader2 className="w-5 h-5 animate-spin text-[#C69C6D]" />
+                        <span>Uploading...</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Upload Controls */}
+                  <div className="flex-1 space-y-2 w-full">
+                    <div>
+                      <label className="cursor-pointer inline-flex items-center justify-center gap-2 bg-[#242424] hover:bg-[#383838] text-[#C69C6D] px-4 py-2 rounded-lg font-bold transition w-full sm:w-auto">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>{directorModal.photo_url ? "Replace Photo From Device" : "Upload Photo From Device"}</span>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,image/avif"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setModalUploading(true);
+                            try {
+                              const url = await uploadPhotoFile(file);
+                              setDirectorModal({
+                                ...directorModal,
+                                photo_url: url,
+                                image_url: url,
+                              });
+                              showToast("Photo uploaded to secure PostgreSQL media storage!");
+                            } catch (err: any) {
+                              alert("Photo upload error: " + err.message);
+                            } finally {
+                              setModalUploading(false);
+                              e.target.value = "";
+                            }
+                          }}
+                        />
+                      </label>
+                      <span className="text-[10px] text-[#787B7E] block mt-1">
+                        JPG, PNG, WebP or AVIF (up to 10MB). Saved securely in database.
+                      </span>
+                    </div>
+
+                    {/* Or URL input */}
+                    <div className="pt-1">
+                      <label className="block text-[10px] text-[#6B6F73] font-bold mb-0.5">
+                        OR DIRECT PHOTO URL / CDN LINK
+                      </label>
+                      <input
+                        type="url"
+                        value={directorModal.photo_url || directorModal.image_url || ""}
+                        onChange={(e) =>
+                          setDirectorModal({
+                            ...directorModal,
+                            photo_url: e.target.value,
+                            image_url: e.target.value,
+                          })
+                        }
+                        className="w-full bg-white border border-[#D9D9D9] rounded-lg px-2.5 py-1.5 text-xs text-[#242424]"
+                        placeholder="https://... or /api/media/..."
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div>
-                <label className="block text-[#4A4D50] mb-1 font-bold">ROLE / TITLE *</label>
-                <input
-                  required
-                  type="text"
-                  value={directorModal.role || ""}
-                  onChange={(e) => setDirectorModal({ ...directorModal, role: e.target.value })}
-                  className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424]"
-                  placeholder="Managing Director & CEO"
-                />
+
+              {/* ── Name & Role ── */}
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[#4A4D50] mb-1 font-bold">FULL NAME *</label>
+                  <input
+                    required
+                    type="text"
+                    value={directorModal.name || ""}
+                    onChange={(e) => setDirectorModal({ ...directorModal, name: e.target.value })}
+                    className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424] font-medium"
+                    placeholder="e.g. Prabhat Yadav"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[#4A4D50] mb-1 font-bold">EXECUTIVE ROLE / TITLE *</label>
+                  <input
+                    required
+                    type="text"
+                    value={directorModal.role || ""}
+                    onChange={(e) => setDirectorModal({ ...directorModal, role: e.target.value })}
+                    className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424] font-medium"
+                    placeholder="Managing Director & CEO"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-[#4A4D50] mb-1 font-bold">YEARS EXPERIENCE BADGE</label>
-                <input
-                  type="text"
-                  value={directorModal.experience || ""}
-                  onChange={(e) => setDirectorModal({ ...directorModal, experience: e.target.value })}
-                  className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424]"
-                  placeholder="32+ Years Experience"
-                />
+
+              {/* ── Designation & Committee ── */}
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[#4A4D50] mb-1 font-bold">OFFICIAL DESIGNATION</label>
+                  <input
+                    type="text"
+                    value={directorModal.designation || ""}
+                    onChange={(e) => setDirectorModal({ ...directorModal, designation: e.target.value })}
+                    className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424]"
+                    placeholder="Managing Director & Chief Executive Officer"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[#4A4D50] mb-1 font-bold">COUNCIL / COMMITTEE ROLE</label>
+                  <input
+                    type="text"
+                    value={directorModal.committee || ""}
+                    onChange={(e) => setDirectorModal({ ...directorModal, committee: e.target.value })}
+                    className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424]"
+                    placeholder="Governing Council & Technical Steering Board"
+                  />
+                </div>
               </div>
+
+              {/* ── Experience & Qualifications ── */}
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[#4A4D50] mb-1 font-bold">EXPERIENCE BADGE</label>
+                  <input
+                    type="text"
+                    value={directorModal.experience || ""}
+                    onChange={(e) => setDirectorModal({ ...directorModal, experience: e.target.value })}
+                    className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424]"
+                    placeholder="30+ Years Experience"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[#4A4D50] mb-1 font-bold">QUALIFICATIONS & CERTIFICATIONS</label>
+                  <input
+                    type="text"
+                    value={directorModal.qualifications || ""}
+                    onChange={(e) => setDirectorModal({ ...directorModal, qualifications: e.target.value })}
+                    className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424]"
+                    placeholder="B.Tech (IT) • ASME B31.8 Specialist"
+                  />
+                </div>
+              </div>
+
+              {/* ── Email & LinkedIn ── */}
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[#4A4D50] mb-1 font-bold">OFFICIAL EMAIL ADDRESS</label>
+                  <input
+                    type="email"
+                    value={directorModal.email || ""}
+                    onChange={(e) => setDirectorModal({ ...directorModal, email: e.target.value })}
+                    className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424]"
+                    placeholder="name@candelaconstruction.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[#4A4D50] mb-1 font-bold">LINKEDIN PROFILE URL</label>
+                  <input
+                    type="url"
+                    value={directorModal.linkedin || ""}
+                    onChange={(e) => setDirectorModal({ ...directorModal, linkedin: e.target.value })}
+                    className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424]"
+                    placeholder="https://linkedin.com/in/..."
+                  />
+                </div>
+              </div>
+
+              {/* ── Background & Bio ── */}
               <div>
-                <label className="block text-[#4A4D50] mb-1 font-bold">BACKGROUND / CREDENTIALS *</label>
+                <label className="block text-[#4A4D50] mb-1 font-bold">PROFESSIONAL BACKGROUND & CREDENTIALS *</label>
                 <textarea
                   required
                   rows={4}
                   value={directorModal.background || ""}
                   onChange={(e) => setDirectorModal({ ...directorModal, background: e.target.value })}
-                  className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424]"
+                  className="w-full bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg p-2.5 text-[#242424] font-sans text-xs leading-relaxed"
+                  placeholder="Comprehensive career background, landmark projects, technical specialties, and executive leadership achievements..."
                 />
               </div>
-              <div className="flex justify-end gap-2 pt-2 border-t border-[#D9D9D9]">
-                <button type="button" onClick={() => setDirectorModal(null)} className="px-4 py-2 text-[#6B6F73]">
+
+              {/* ── Form Actions ── */}
+              <div className="flex items-center justify-between pt-3 border-t border-[#D9D9D9]">
+                <button
+                  type="button"
+                  onClick={() => setDirectorModal(null)}
+                  className="px-4 py-2 text-[#6B6F73] hover:text-[#242424] font-bold transition"
+                >
                   Cancel
                 </button>
-                <button type="submit" className="bg-[#C69C6D] hover:bg-[#B08554] text-[#242424] font-bold px-5 py-2 rounded-xl">
-                  Save Director
+                <button
+                  type="submit"
+                  disabled={modalUploading}
+                  className="bg-[#C69C6D] hover:bg-[#B08554] text-[#242424] font-bold px-6 py-2.5 rounded-xl shadow-xs transition flex items-center gap-2 disabled:opacity-50"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>Save Member & Update Site</span>
                 </button>
               </div>
             </form>
