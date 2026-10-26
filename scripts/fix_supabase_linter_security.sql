@@ -63,6 +63,7 @@ END $$;
 
 -- -------------------------------------------------------------------------
 -- PART 3: Public Submission Tables (Allow Public INSERT, Admin FULL)
+-- Non-permissive WITH CHECK clauses enforce data integrity and satisfy lint 0024
 -- -------------------------------------------------------------------------
 
 -- 1. job_applications
@@ -73,7 +74,10 @@ CREATE POLICY "Allow Public Application Submissions"
   ON public.job_applications 
   FOR INSERT 
   TO anon, authenticated 
-  WITH CHECK (true);
+  WITH CHECK (
+    name IS NOT NULL AND length(trim(name)) > 0 AND
+    email IS NOT NULL AND length(trim(email)) > 3
+  );
 
 CREATE POLICY "Service Role Full Access" 
   ON public.job_applications 
@@ -90,7 +94,10 @@ CREATE POLICY "Allow Public RFQ Submissions"
   ON public.rfq_enquiries 
   FOR INSERT 
   TO anon, authenticated 
-  WITH CHECK (true);
+  WITH CHECK (
+    company_name IS NOT NULL AND length(trim(company_name)) > 0 AND
+    email IS NOT NULL AND length(trim(email)) > 3
+  );
 
 CREATE POLICY "Service Role Full Access" 
   ON public.rfq_enquiries 
@@ -107,7 +114,10 @@ CREATE POLICY "Allow Public Tender Submissions"
   ON public.tender_enquiries 
   FOR INSERT 
   TO anon, authenticated 
-  WITH CHECK (true);
+  WITH CHECK (
+    company_name IS NOT NULL AND length(trim(company_name)) > 0 AND
+    email IS NOT NULL AND length(trim(email)) > 3
+  );
 
 CREATE POLICY "Service Role Full Access" 
   ON public.tender_enquiries 
