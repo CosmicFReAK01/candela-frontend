@@ -41,6 +41,8 @@ import {
   Mail,
   Linkedin,
   Loader2,
+  Download,
+  Paperclip,
 } from "lucide-react";
 
 export default function AdminPortal() {
@@ -96,6 +98,7 @@ export default function AdminPortal() {
   const [regionalBaseModal, setRegionalBaseModal] = useState<any | null>(null);
   const [pillarModal, setPillarModal] = useState<any | null>(null);
   const [viewNotesModal, setViewNotesModal] = useState<{ type: "rfq" | "application"; item: any } | null>(null);
+  const [selectedTenderModal, setSelectedTenderModal] = useState<any | null>(null);
   const [uploadingLeaderIdx, setUploadingLeaderIdx] = useState<number | null>(null);
   const [modalUploading, setModalUploading] = useState<boolean>(false);
 
@@ -349,6 +352,9 @@ export default function AdminPortal() {
       });
       if (!res.ok) throw new Error("Failed to delete record");
       showToast(`Deleted ${deleteConfirm.title} from database.`);
+      if (selectedTenderModal && deleteConfirm.module === "rfq" && selectedTenderModal.id === deleteConfirm.id) {
+        setSelectedTenderModal(null);
+      }
       setDeleteConfirm(null);
       loadAllData();
     } catch (err: any) {
@@ -409,10 +415,44 @@ export default function AdminPortal() {
         setRfqs((prev) =>
           prev.map((r) => (r.id === rfqId ? { ...r, status: newStatus, admin_notes: adminNotes !== undefined ? adminNotes : r.admin_notes } : r))
         );
+        if (selectedTenderModal && selectedTenderModal.id === rfqId) {
+          setSelectedTenderModal((prev: any) => ({
+            ...prev,
+            status: newStatus,
+            admin_notes: adminNotes !== undefined ? adminNotes : prev.admin_notes,
+          }));
+        }
         showToast(`RFQ status updated to ${newStatus}`);
       }
     } catch {
       alert("Failed to update RFQ");
+    }
+  };
+
+  const handleDeleteRfqDocument = async (rfqId: string, docName: string) => {
+    if (!confirm(`Are you sure you want to delete document "${docName}" from this RFQ enquiry? The tender record itself will remain.`)) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/admin/rfq?id=${encodeURIComponent(rfqId)}&documentOnly=true`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete document");
+      showToast("Tender document removed from database.");
+      setRfqs((prev) =>
+        prev.map((r) => (r.id === rfqId ? { ...r, document_url: null, document_name: null, document_size: null } : r))
+      );
+      if (selectedTenderModal && selectedTenderModal.id === rfqId) {
+        setSelectedTenderModal((prev: any) => ({
+          ...prev,
+          document_url: null,
+          document_name: null,
+          document_size: null,
+        }));
+      }
+    } catch (err: any) {
+      alert("Failed to delete document: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -3011,13 +3051,20 @@ export default function AdminPortal() {
              ════════════════════════════════════════════════════════════ */}
           {activeTab === "rfq" && (
             <div className="space-y-6">
-              <div className="pb-4 border-b border-[#D9D9D9]">
-                <h2 className="font-heading font-extrabold text-2xl text-[#242424]">
-                  RFQ & Tender Enquiries Inbox
-                </h2>
-                <p className="text-xs text-[#6B6F73] mt-0.5 font-mono">
-                  Review and progress commercial enquiries submitted through the RFQ form.
-                </p>
+              <div className="pb-4 border-b border-[#D9D9D9] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h2 className="font-heading font-extrabold text-2xl text-[#242424]">
+                    RFQ & Tender Enquiries Inbox
+                  </h2>
+                  <p className="text-xs text-[#6B6F73] mt-0.5 font-mono">
+                    Review specifications, download attached NIT/BOQ documents, and manage commercial tender submissions.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono px-3 py-1 bg-[#F8F4EC] border border-[#D9D9D9] rounded-lg text-[#9E7444] font-bold">
+                    Total Enquiries: {rfqs.length}
+                  </span>
+                </div>
               </div>
 
               {rfqs.length === 0 ? (
@@ -3025,33 +3072,86 @@ export default function AdminPortal() {
                   No tender submissions logged yet.
                 </div>
               ) : (
-                <div className="overflow-x-auto border border-[#D9D9D9] rounded-xl">
+                <div className="overflow-x-auto border border-[#D9D9D9] rounded-xl shadow-xs">
                   <table className="w-full text-xs font-mono text-left">
                     <thead className="bg-[#F8F4EC] border-b border-[#D9D9D9] text-[#6B6F73] uppercase">
                       <tr>
                         <th className="p-3">Ref No</th>
                         <th className="p-3">Client / Organization</th>
                         <th className="p-3">Contact</th>
+                        <th className="p-3">Project Type</th>
                         <th className="p-3">Scope / Specs</th>
+                        <th className="p-3">NIT / BOQ Document</th>
                         <th className="p-3">Status</th>
                         <th className="p-3">Admin Notes</th>
-                        <th className="p-3 text-right">Action</th>
+                        <th className="p-3 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#D9D9D9]">
                       {rfqs.map((r) => (
                         <tr key={r.id} className="hover:bg-[#F8F4EC]/50 transition">
-                          <td className="p-3 font-bold text-[#9E7444]">{r.reference_no}</td>
+                          <td className="p-3 font-bold text-[#9E7444] whitespace-nowrap">
+                            {r.reference_no}
+                          </td>
                           <td className="p-3">
                             <div className="font-bold text-[#242424]">{r.company_name}</div>
-                            <div className="text-[10px] text-[#6B6F73]">{r.location}</div>
+                            <div className="text-[10px] text-[#6B6F73]">{r.location || "Location not specified"}</div>
                           </td>
                           <td className="p-3 text-[#6B6F73]">
-                            <div>{r.contact_person}</div>
+                            <div className="font-medium text-[#242424]">{r.contact_person}</div>
                             <div className="text-[10px]">{r.email}</div>
+                            {r.phone && <div className="text-[10px] text-[#9E7444] font-bold">{r.phone}</div>}
                           </td>
-                          <td className="p-3 text-[#4A4D50]">
-                            {r.diameter} · {r.approx_length}
+                          <td className="p-3">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-[#242424]/5 text-[#242424] border border-[#D9D9D9] max-w-[140px] truncate" title={r.project_type || "Natural Gas Pipeline"}>
+                              {r.project_type || "Natural Gas Pipeline"}
+                            </span>
+                          </td>
+                          <td className="p-3 text-[#4A4D50] whitespace-nowrap">
+                            <div className="font-semibold">{r.diameter || "—"}</div>
+                            <div className="text-[10px] text-[#6B6F73]">{r.approx_length || "—"}</div>
+                          </td>
+                          <td className="p-3">
+                            {r.document_url ? (
+                              <div className="inline-flex items-center gap-1.5 bg-[#FAF8F5] border border-[#9E7444]/30 rounded-lg px-2.5 py-1.5 max-w-[220px]">
+                                <Paperclip className="w-3.5 h-3.5 text-[#9E7444] shrink-0" />
+                                <div className="min-w-0 flex-1">
+                                  <a
+                                    href={r.document_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    download={r.document_name || "tender_document"}
+                                    title={`Download ${r.document_name || "Document"}`}
+                                    className="text-[11px] font-bold text-[#9E7444] hover:underline truncate block"
+                                  >
+                                    {r.document_name || "NIT_BOQ_Doc"}
+                                  </a>
+                                  {r.document_size && (
+                                    <div className="text-[9px] text-[#6B6F73]">{r.document_size}</div>
+                                  )}
+                                </div>
+                                <a
+                                  href={r.document_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  download={r.document_name || "tender_document"}
+                                  className="p-1 hover:bg-[#9E7444]/10 rounded text-[#9E7444]"
+                                  title="Download Document"
+                                >
+                                  <Download className="w-3.5 h-3.5" />
+                                </a>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteRfqDocument(r.id, r.document_name || "document")}
+                                  className="p-1 hover:bg-red-100 rounded text-red-500"
+                                  title="Delete Document only"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-[11px] text-[#8C9094] italic">No document</span>
+                            )}
                           </td>
                           <td className="p-3">
                             <select
@@ -3080,13 +3180,23 @@ export default function AdminPortal() {
                               </div>
                             )}
                           </td>
-                          <td className="p-3 text-right">
-                            <button
-                              onClick={() => setDeleteConfirm({ module: "rfq", id: r.id, title: r.reference_no })}
-                              className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
+                          <td className="p-3 text-right whitespace-nowrap">
+                            <div className="flex items-center justify-end gap-1">
+                              <button
+                                onClick={() => setSelectedTenderModal(r)}
+                                title="View Tender Specifications & Scope"
+                                className="p-1.5 text-[#242424] hover:text-[#9E7444] hover:bg-[#F8F4EC] rounded transition"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirm({ module: "rfq", id: r.id, title: `RFQ ${r.reference_no} (${r.company_name})` })}
+                                title="Delete Entire Tender & Documents"
+                                className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -4414,6 +4524,201 @@ export default function AdminPortal() {
       )}
 
       {/* ══════════════════════════════════════════════════════════════════
+          TENDER SPECIFICATIONS & DETAILS MODAL
+         ══════════════════════════════════════════════════════════════════ */}
+      {selectedTenderModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
+          <div className="bg-white border border-[#D9D9D9] rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-5 my-8 max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-start justify-between border-b border-[#D9D9D9] pb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 text-xs font-mono font-bold bg-[#9E7444]/10 text-[#9E7444] rounded-md border border-[#9E7444]/20">
+                    {selectedTenderModal.reference_no}
+                  </span>
+                  <span className="px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded bg-gray-100 text-gray-700">
+                    {selectedTenderModal.status || "NEW"}
+                  </span>
+                </div>
+                <h3 className="font-heading font-extrabold text-xl text-[#242424] mt-2">
+                  {selectedTenderModal.company_name}
+                </h3>
+                <p className="text-xs text-[#6B6F73] font-mono mt-0.5">
+                  Logged on {selectedTenderModal.created_at ? new Date(selectedTenderModal.created_at).toLocaleString() : "Recently"}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedTenderModal(null)}
+                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Grid details */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
+              <div className="p-3.5 bg-[#FAF8F5] rounded-xl border border-[#D9D9D9] space-y-2">
+                <span className="text-[10px] font-bold text-[#9E7444] uppercase tracking-wider block">
+                  Client & Contact Information
+                </span>
+                <div>
+                  <div className="text-[10px] text-[#6B6F73]">Contact Person:</div>
+                  <div className="font-bold text-[#242424] text-sm">{selectedTenderModal.contact_person}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-[#6B6F73]">Email Address:</div>
+                  <a href={`mailto:${selectedTenderModal.email}`} className="text-[#9E7444] hover:underline font-semibold">
+                    {selectedTenderModal.email}
+                  </a>
+                </div>
+                <div>
+                  <div className="text-[10px] text-[#6B6F73]">Phone / Hotline:</div>
+                  <div className="text-[#242424] font-semibold">{selectedTenderModal.phone || "Not specified"}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-[#6B6F73]">Project Location:</div>
+                  <div className="text-[#242424]">{selectedTenderModal.location || "Not specified"}</div>
+                </div>
+              </div>
+
+              <div className="p-3.5 bg-[#FAF8F5] rounded-xl border border-[#D9D9D9] space-y-2">
+                <span className="text-[10px] font-bold text-[#9E7444] uppercase tracking-wider block">
+                  Engineering Scope & Specs
+                </span>
+                <div>
+                  <div className="text-[10px] text-[#6B6F73]">Project Type:</div>
+                  <div className="font-bold text-[#242424] text-xs bg-white px-2 py-1 rounded border border-[#D9D9D9] inline-block mt-0.5">
+                    {selectedTenderModal.project_type || "Natural Gas Pipeline"}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-[#6B6F73]">Pipeline Diameter:</div>
+                  <div className="text-[#242424] font-semibold">{selectedTenderModal.diameter || "Not specified"}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-[#6B6F73]">Approximate Length / Distance:</div>
+                  <div className="text-[#242424] font-semibold">{selectedTenderModal.approx_length || "Not specified"}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Tender Scope Description */}
+            <div className="space-y-1.5 font-mono text-xs">
+              <span className="text-[10px] font-bold text-[#6B6F73] uppercase tracking-wider block">
+                Project Scope / Technical Description
+              </span>
+              <div className="p-3.5 bg-gray-50 border border-[#D9D9D9] rounded-xl text-gray-800 whitespace-pre-wrap leading-relaxed max-h-36 overflow-y-auto">
+                {selectedTenderModal.description || "No additional description provided by client."}
+              </div>
+            </div>
+
+            {/* Attached NIT / BOQ Document Section */}
+            <div className="space-y-2 font-mono text-xs">
+              <span className="text-[10px] font-bold text-[#6B6F73] uppercase tracking-wider block">
+                Attached NIT / BOQ Document (Stored in Database)
+              </span>
+              {selectedTenderModal.document_url ? (
+                <div className="p-4 bg-emerald-50/60 border border-emerald-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-600/10 text-emerald-700 flex items-center justify-center shrink-0">
+                      <Paperclip className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-[#242424] text-xs break-all">
+                        {selectedTenderModal.document_name || "tender_document.pdf"}
+                      </div>
+                      <div className="text-[10px] text-[#6B6F73]">
+                        Size: {selectedTenderModal.document_size || "Unknown"} · Stored in database <code className="text-emerald-700 bg-emerald-100/50 px-1 py-0.5 rounded">media_assets</code>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <a
+                      href={selectedTenderModal.document_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download={selectedTenderModal.document_name || "tender_document"}
+                      className="px-3 py-1.5 bg-[#9E7444] hover:bg-[#866033] text-white rounded-lg font-bold text-xs flex items-center gap-1.5 shadow-xs transition"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Download</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteRfqDocument(selectedTenderModal.id, selectedTenderModal.document_name || "document")}
+                      className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg font-bold text-xs flex items-center gap-1.5 transition"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete Document</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-4 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-center text-gray-500">
+                  No NIT / BOQ document attached to this enquiry.
+                </div>
+              )}
+            </div>
+
+            {/* Admin Notes & Workflow status */}
+            <div className="p-3.5 bg-[#FAF8F5] border border-[#D9D9D9] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-[#6B6F73]">Workflow Status:</span>
+                <select
+                  value={selectedTenderModal.status || "NEW"}
+                  onChange={(e) => handleUpdateRfqStatus(selectedTenderModal.id, e.target.value)}
+                  className="px-2.5 py-1 rounded-lg text-xs font-bold border bg-white border-[#D9D9D9]"
+                >
+                  <option value="PENDING_REVIEW">PENDING REVIEW</option>
+                  <option value="NEW">NEW</option>
+                  <option value="UNDER REVIEW">UNDER REVIEW</option>
+                  <option value="QUOTED">QUOTED</option>
+                  <option value="ARCHIVED">ARCHIVED</option>
+                </select>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setViewNotesModal({ type: "rfq", item: selectedTenderModal });
+                }}
+                className="text-[#9E7444] hover:underline font-bold flex items-center gap-1 text-xs"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>{selectedTenderModal.admin_notes ? "Edit Internal Notes" : "+ Add Internal Notes"}</span>
+              </button>
+            </div>
+
+            {/* Footer Buttons */}
+            <div className="flex items-center justify-between pt-2 border-t border-[#D9D9D9]">
+              <button
+                type="button"
+                onClick={() => {
+                  setDeleteConfirm({
+                    module: "rfq",
+                    id: selectedTenderModal.id,
+                    title: `RFQ ${selectedTenderModal.reference_no} (${selectedTenderModal.company_name})`,
+                  });
+                }}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-mono text-xs font-bold flex items-center gap-1.5 transition"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Delete Tender & Documents</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedTenderModal(null)}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-mono text-xs font-bold transition"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════
           CONFIRM DELETE MODAL
          ══════════════════════════════════════════════════════════════════ */}
       {deleteConfirm && (
@@ -4425,7 +4730,7 @@ export default function AdminPortal() {
             </div>
             <p className="text-xs text-[#4A4D50] font-mono leading-relaxed">
               Are you sure you want to delete <span className="font-bold text-[#242424]">"{deleteConfirm.title}"</span>?
-              This will permanently delete the record from PostgreSQL on port 5433.
+              This will permanently delete the record and its attached files from the database.
             </p>
             <div className="flex justify-end gap-3 pt-2">
               <button

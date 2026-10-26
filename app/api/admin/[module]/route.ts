@@ -603,8 +603,25 @@ export async function DELETE(req: Request, { params }: RouteProps) {
       }
 
       case "rfq": {
+        const docOnly = searchParams.get("documentOnly") === "true";
+        const rfqRows = await query(`SELECT document_url FROM rfq_enquiries WHERE id::text = $1::text;`, [id]);
+        if (rfqRows.length > 0 && rfqRows[0]?.document_url) {
+          const match = rfqRows[0].document_url.match(/\/api\/media\/(.+)/);
+          if (match && match[1]) {
+            await query(`DELETE FROM media_assets WHERE id = $1;`, [match[1]]);
+          }
+        }
+
+        if (docOnly) {
+          await query(
+            `UPDATE rfq_enquiries SET document_url = NULL, document_name = NULL, document_size = NULL WHERE id::text = $1::text;`,
+            [id]
+          );
+          return NextResponse.json({ success: true, message: `Document removed for RFQ ${id}` });
+        }
+
         await query(`DELETE FROM rfq_enquiries WHERE id::text = $1::text;`, [id]);
-        return NextResponse.json({ success: true, message: `RFQ ${id} deleted` });
+        return NextResponse.json({ success: true, message: `RFQ ${id} and attached documents deleted` });
       }
 
       case "applications": {

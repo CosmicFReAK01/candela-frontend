@@ -21,6 +21,10 @@ export interface RfqPayload {
   diameter: string;
   projectType: string;
   description: string;
+  documentFile?: File | null;
+  documentUrl?: string | null;
+  documentName?: string | null;
+  documentSize?: string | null;
 }
 
 export interface RfqResponse {
@@ -29,6 +33,9 @@ export interface RfqResponse {
   message: string;
   status: string;
   estimatedTurnaround: string;
+  documentUrl?: string | null;
+  documentName?: string | null;
+  documentSize?: string | null;
   timestamp?: string;
 }
 
@@ -87,13 +94,36 @@ export interface ApplicationResponse {
 }
 
 // ── Tendering & Cost Estimator API ──
-export async function submitRfq(data: RfqPayload): Promise<RfqResponse> {
+export async function submitRfq(data: RfqPayload | FormData): Promise<RfqResponse> {
   const url = typeof window !== "undefined" ? "/api/rfq" : `${typeof window !== "undefined" ? "" : API_BASE_URL}/api/rfq`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
+  let res: Response;
+
+  if (typeof FormData !== "undefined" && data instanceof FormData) {
+    res = await fetch(url, {
+      method: "POST",
+      body: data,
+    });
+  } else if (typeof data === "object" && "documentFile" in data && data.documentFile) {
+    const fd = new FormData();
+    Object.entries(data).forEach(([k, v]) => {
+      if (k === "documentFile" && v instanceof File) {
+        fd.append("document", v);
+      } else if (v !== undefined && v !== null) {
+        fd.append(k, String(v));
+      }
+    });
+    res = await fetch(url, {
+      method: "POST",
+      body: fd,
+    });
+  } else {
+    res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+  }
+
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.message || `Failed to submit RFQ (HTTP ${res.status})`);
